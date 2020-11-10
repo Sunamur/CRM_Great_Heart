@@ -7,33 +7,22 @@ from flask_security.utils import encrypt_password
 import flask_admin
 from flask_admin.contrib import sqla
 from flask_admin import helpers as admin_helpers
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, URL
 from wtforms import TextField, Form, SubmitField, SelectField
 import json
 from sqlalchemy.orm import sessionmaker
-import sqlite3
 import enum
 import psycopg2
 
-try: 
-    connection = psycopg2.connect(user = 'obcayovm',
-                                 password = 'ItiplxDZiHmnUo_7WdFtv3M67FcW1sCM',
-                                 port = '5432', 
-                                 host = 'postgres://obcayovm:ItiplxDZiHmnUo_7WdFtv3M67FcW1sCM@hattie.db.elephantsql.com:5432/obcayovm')
-    cursor = connection.cursor()
-    # Print PostgreSQL Connection properties
-    print ( connection.get_dsn_parameters(),"\n")
-
-    # Print PostgreSQL version
-    cursor.execute("SELECT version();")
-    record = cursor.fetchone()
-    print("You are connected to - ", record,"\n")
-except (Exception, psycopg2.Error) as error :
-    print ("Error while connecting to PostgreSQL", error)
 # Create Flask application
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 db = SQLAlchemy(app)
+
+engine = db.create_engine('postgres://obcayovm:ItiplxDZiHmnUo_7WdFtv3M67FcW1sCM@hattie.db.elephantsql.com:5432/obcayovm', {})
+# connection = engine.connect()
+# connection.close()
+# engine.dispose()
 
 class SearchForm(Form):
     autocomp = TextField(u"Введите имя", id='city_autocomplete')
@@ -43,14 +32,12 @@ class SearchForm(Form):
 # Define models
 roles_users = db.Table(
     'roles_users',
-    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
-    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('roles.user_id'))
 )
 
-
-
 class Role(db.Model, RoleMixin):
-    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
 
@@ -58,20 +45,25 @@ class Role(db.Model, RoleMixin):
         return self.name
 
 
-class User(db.Model, UserMixin):
-    __tablename__ = 'user'
+class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(255))
-    last_name = db.Column(db.String(255))
-    email = db.Column(db.String(255), unique=True)
+    login = db.Column(db.String(20), unique=True)
+    name = db.Column(db.String(255))
+    surname = db.Column(db.String(255))
+    birth_date = db.Column(db.String(10))
+    city = db.Column(db.String(20), unique=False, nullable=False, default='')
+    phone_personal = db.Column(db.String(20), unique=False, nullable=False, default='')
+    # email = db.Column(db.String(255), unique=True)
+    email_personal = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255))
+
     active = db.Column(db.Boolean())
-    roles = db.relationship('Role', secondary=roles_users,
-                            backref=db.backref('users', lazy='dynamic'))
+    # roles = db.relationship('Role', secondary=roles_users,
+    #                         backref=db.backref('users', lazy='dynamic'))
     
 
     def __str__(self):
-        return self.email
+        return self.email_personal
 
 class slaves_state_Enum(enum.Enum):
     heavy = 'heavy'
@@ -126,7 +118,6 @@ class Partners(db.Model):
 
 class Sponsor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     type = db.Column(db.Enum(partner_type_Enum), unique=False, nullable=False, default='')
     reg_requisites= db.Column(db.String(100), unique=False, nullable=False, default='')
@@ -169,7 +160,7 @@ class Event(db.Model):
 
 
 # Setup Flask-Security
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+user_datastore = SQLAlchemyUserDatastore(engine, Users, Role)
 security = Security(app, user_datastore)
 
 
@@ -225,9 +216,6 @@ class DirReg_ALL_ModVw(sqla.ModelView):
                 # login
                 return redirect(url_for('security.login', next=request.url))
 
-
-    column_exclude_list = ['position', 'int_2', 'mob_2', 'mob_3', 'viber', 'telegram', 'whatsup', 'srv_2', 'srv_3',
-                           'home', 'fax', 'skype']
     # create_modal = True
     # edit_modal = True
     # can_export = True
@@ -242,14 +230,14 @@ class DirReg_ALL_ModVw(sqla.ModelView):
         'phone_2': {'label': "Внутренний номер телефона №2"},
         'city': {'label': "Город"}
     }
-    form_choices = {
-        'company': [
-            ('', '-'),
-            ('Киев', 'Киев'),
-            ('Львов', 'Львов'),
-            ('Лондон', 'Лондон'),
-        ]
-    }
+    # form_choices = {
+    #     'company': [
+    #         ('', '-'),
+    #         ('Киев', 'Киев'),
+    #         ('Львов', 'Львов'),
+    #         ('Лондон', 'Лондон'),
+    #     ]
+    # }
 
 
 
@@ -274,50 +262,58 @@ def home():
 
 @app.route('/select', methods=['GET', 'POST'])
 def select():
-    name = request.form.get('autocomp')
-    PAO = request.form.get('PAO')
-    if name == None:
-        return redirect('/')
-    if name == "" and PAO == "Все":
-        return redirect('/')
-    elif name != "" and PAO != "Все":
-        query = 'SELECT fullname, company, position, int_1, mob_1, email, id from Slaves where fullname like "' + name + '%" and company = "' + PAO + '" ORDER BY fullname'
-    elif name == "" and PAO != "Все":
-        query = 'SELECT fullname, company, position,int_1, mob_1, email, id  from Slaves where company = "' + PAO + '" ORDER BY fullname'
-    elif name != "" and PAO == "Все":
-        query = 'SELECT fullname, company, position, int_1, mob_1, email, id from Slaves where fullname like "' + name + '%" ORDER BY fullname'
-    else:
-        return redirect('/')
-    # return query
-    try:
-        con = sqlite3.connect('Directory.db')
-        cur = con.cursor()
-        cur.execute(query)
-        data = cur.fetchall()
-        con.close()
+    # name = request.form.get('autocomp')
+    # PAO = request.form.get('PAO')
+    # if name == None:
+    #     return redirect('/')
+    # if name == "" and PAO == "Все":
+    #     return redirect('/')
+    # elif name != "" and PAO != "Все":
+    #     query = 'SELECT name, surname, diagnosis, position, int_1, mob_1, email, id from  where fullname like "' + name + '%" and company = "' + PAO + '" ORDER BY fullname'
+    # elif name == "" and PAO != "Все":
+    #     query = 'SELECT fullname, company, position,int_1, mob_1, email, id  from Slaves where company = "' + PAO + '" ORDER BY fullname'
+    # elif name != "" and PAO == "Все":
+    #     query = 'SELECT fullname, company, position, int_1, mob_1, email, id from Slaves where fullname like "' + name + '%" ORDER BY fullname'
+    # else:
+    #     return redirect('/')
+    query = 'SELECT fullname, company, position from users'
+    try: 
+        # connection = psycopg2.connect(user = 'obcayovm',
+        #                               password = 'ItiplxDZiHmnUo_7WdFtv3M67FcW1sCM',
+        #                               port = '5432', 
+        #                               host = 'hattie.db.elephantsql.com')
+        cursor = engine.cursor()
+        cursor.execute(query)
+        records = cursor.fetchall()
+        cursor.close()
+        # connection.close()      
         form = SearchForm(request.form)
-        return render_template('formselect.html', form=form, data=data)
-    except Exception as e:
-        return (str(e))
+        return render_template('formselect.html', form=form, data=records)
+    except (Exception, psycopg2.Error) as error :
+        print ("Error while connecting to PostgreSQL", error)
 
 
 ################## Detail
 @app.route("/detail/<id>", methods=['GET', 'POST'])
 def detail(id):
-    query = 'SELECT * from directory where id = "' + id + '"'
+    query = 'SELECT * from clients where id = "' + id + '"'
     try:
-        con = sqlite3.connect('Directory.db')
-        cur = con.cursor()
-        cur.execute(query)
-        data = cur.fetchall()
-        con.close()
+        # connection = psycopg2.connect(user = 'obcayovm',
+        #                               password = 'ItiplxDZiHmnUo_7WdFtv3M67FcW1sCM',
+        #                               port = '5432', 
+        #                               host = 'hattie.db.elephantsql.com')
+        cursor = engine.cursor()
+        cursor.execute(query)
+        records = cursor.fetchall()
+        cursor.close()
+        # connection.close()
 
         laa = []
-        for i in data:
+        for i in records:
             for x in i:
                 laa.append(str(x))
         sname = laa[1]
-        return render_template('detail.html', sname=sname, data=data)
+        return render_template('detail.html', sname=sname, data=records)
     except Exception as e:
         return (str(e))
 
@@ -336,7 +332,7 @@ admin = flask_admin.Admin(
 
 # model views для Администрирования
 admin.add_view(superuser_ModVw(Role, db.session))
-admin.add_view(superuser_ModVw(User, db.session))
+admin.add_view(superuser_ModVw(Users, db.session))
 # model view для Всей таблици
 admin.add_view(DirReg_ALL_ModVw(Slaves, db.session))
 
@@ -354,4 +350,4 @@ def security_context_processor():
 
 if __name__ == "__main__":
     app.secret_key = os.urandom(100)
-    app.run(debug=False,host='127.0.0.1', port=5000)
+    app.run(debug=True,host='127.0.0.1', port=5000)

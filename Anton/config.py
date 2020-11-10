@@ -3,7 +3,7 @@
 SECRET_KEY = '1234__some__passwd'
 
 # Create in-memory database
-SQLALCHEMY_DATABASE_URI = 'sqlite:///Directory.db'
+SQLALCHEMY_DATABASE_URI = 'postgres://obcayovm:ItiplxDZiHmnUo_7WdFtv3M67FcW1sCM@hattie.db.elephantsql.com:5432/obcayovm'
 SQLALCHEMY_ECHO = True
 
 # Flask-Security config
