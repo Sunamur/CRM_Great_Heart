@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    div.with-margins {
+        margin-left: -180px;
+    }
+</style>
+
+<div class="container">
+    <h1>Таблица членов Фонда</h1>
+
+    <table class="table table-stripped table-bordered table-hover model-list">
+        <thead>
+            <tr>
+                {% for db_field, table_field in values %}
+                    <th class="column-header col-{{db_field}}"><a>{{table_field}}</a></th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <!-- Лёнь, вставь сюда данные -->
+            </tr>
+        </tbody>
+
+    </table>
+</div>
+{% endblock %}

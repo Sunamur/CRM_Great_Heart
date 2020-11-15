@@ -1,7 +1,7 @@
 from auth import login_required, get_login_info
 from flask import redirect, render_template, Blueprint, request, session, url_for, flash
 from app import db
-import pandas as pd
+# import pandas as pd
 
 main_blueprint = Blueprint('main', __name__, template_folder='templates')
 
@@ -42,7 +42,7 @@ def client_registration():
 
     fields = [('name', "Иван", 'Имя', True), 
               ('surname', "Иванов", 'Фамилия', True), 
-              ('birthdate', "01-01-2020", 'Дата рождения', True),
+              ('birth', "01-01-2020", 'Дата рождения', True),
               ('diagnosis', "Поступил на ФТиАД", 'Диагноз', True),
               ('condition', "Учится на ФТиАД", 'Состояние', True),
               ('phone_main', "+7-800-555-35-35", 'Основной телефон для связи', True),
@@ -58,9 +58,26 @@ def client_registration():
 @main_blueprint.route('/users', methods=['GET', 'POST'])
 @login_required
 def users_table():
-    return render_template('users.html')  # render a template
+    fields = [('name', 'Имя'), 
+              ('surname', 'Фамилия'), 
+              ('birth_date', 'Дата рождения'),
+              ('city', 'Город'),
+              ('phone_personal', 'Основной телефон для связи'),
+              ('phone_work', 'Дополнительный телефон для связи'),
+              ('work_place', 'Место основной работы'),
+              ('position_fund', 'Позиция в фонде'),
+              ('education', 'Образование'),
+              ('education_minor', 'Доп. образование'),
+              ('languages', 'Знание языков'),
+              ('tg_id', 'Контакт в Телеграм'),
+              ('email_personal', 'Email'),
+              ('position', 'Профессия'),
+              ('hobbies', 'Хобби'),
+              ('comment', 'Комментарий')]
 
-@main_blueprint.route('/users', methods=['GET', 'POST'])
+    return render_template('users.html', values=fields)  # render a template
+
+@main_blueprint.route('/sponsors', methods=['GET', 'POST'])
 @login_required
 def sponsors_table():
     return render_template('sponsors.html')  # render a template
@@ -68,7 +85,19 @@ def sponsors_table():
 @main_blueprint.route('/slaves', methods=['GET', 'POST'])
 @login_required
 def slaves_table():
-    return render_template('slaves.html')  # render a template
+    fields = [('name', 'Имя'), 
+              ('surname', 'Фамилия'), 
+              ('birth', 'Дата рождения'),
+              ('diagnosis', 'Диагноз'),
+              ('condition', 'Состояние'),
+              ('phone_main', 'Основной телефон для связи'),
+              ('phone_secondary', 'Дополнительный телефон для связи'),
+              ('tg_id', 'Контакт в Телеграм'),
+              ('email', 'Email'),
+              ('position', 'Профессия'),
+              ('hobbies', 'Хобби'),
+              ('comment', 'Комментарий')]
+    return render_template('slaves.html', values=fields)  # render a template
 
 @main_blueprint.route('/partners', methods=['GET', 'POST'])
 @login_required
