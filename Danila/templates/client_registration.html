@@ -14,7 +14,8 @@
           request.form.surname }}"> <br>
          <input type="text" placeholder="dd-mm-yyyy" name="birth" value="{{
           request.form.birth }}"> <br>
-          <input list="Condition" name="condition"><br>
+          <input placeholder="Condition" list="Condition" name="condition" required
+          value = "{{request.form.condition}}"><br>
           <datalist id="Condition">
             <option value="Healthy">
             <option value="Disease diagnosed">

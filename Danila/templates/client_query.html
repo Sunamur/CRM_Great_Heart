@@ -20,10 +20,17 @@
           request.form.query_text }}"> <br>
           <input type="text" placeholder="Screenshot" name="screenshot"  value="{{
           request.form.screenshot }}"> <br>
-          <input type="text" placeholder="Status" name="query_status"  value="{{
-          request.form.query_status }}"> <br>
-
-
+          <input placeholder="Status" list="Status" name="query_status" required
+          value = "{{request.form.query_status}}"><br>
+          <datalist id="Status">
+            <option value="New">
+            <option value="Formalized">
+            <option value="Ready">
+            <option value="In work">
+            <option value="Done">
+              <option value="Closed">
+              <option value="Rejected">
+          </datalist>
         <input class="btn btn-default" type="submit" value="Create client's query">
       </form>
       {% if error %}

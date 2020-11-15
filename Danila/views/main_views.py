@@ -26,10 +26,12 @@ def client_registration():
             if (value != '') :
                 client_dict[key] = value
 
-
         cols = list(client_dict.keys())
         cols = ", ".join(list(cols))
         vals = list(client_dict.values())
+        for i in range(len(vals)):
+            if isinstance(vals[i], str):
+                vals[i] = "'" + vals[i] + "'"
         vals = ", ".join(list(vals))
         q = f'''
         Insert into clients ({cols})
@@ -81,9 +83,11 @@ def client_query():
         cols = list(clients_query_dict.keys())
         cols = ", ".join(list(cols))
         vals = list(clients_query_dict.values())
+        for i in range(len(vals)):
+            if isinstance(vals[i], str):
+                vals[i] = "'" + vals[i] + "'"
         vals = ", ".join(list(vals))
-
-        id = f"""select id from clients where phone_main = cast({request.form['phone']} as varchar)"""
+        id = f"""select id from clients where phone_main = cast('{request.form['phone']}' as varchar)"""
         client_id = -1
         q = f'''
                 Insert into clients_queries (query_date, query_timestamp, query_status_updated_at, query_executer, query_coordinator, client_id, {cols})
@@ -94,7 +98,7 @@ def client_query():
         , 1
         , 1
         , {client_id}
-        ,{vals}
+        , {vals}
         )
                 '''
         with db.connect() as con:
