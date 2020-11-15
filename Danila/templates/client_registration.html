@@ -9,32 +9,32 @@
       <h1>Client registraion form</h1>
       <br>
       <form action="" method="post">
-        <input type="text" placeholder="Name" name="Name" required value="{{
+        <input type="text" placeholder="Name" name="name" required value="{{
           request.form.name }}"> <br>
-          <input type="text" placeholder="Surname" name="Surname" required value="{{
+          <input type="text" placeholder="Surname" name="surname" required value="{{
           request.form.surname }}"> <br>
 
 <!--          проебал в базе-->
-         <input type="text" placeholder="dd-mm-yyyy" name="Birth date" value="{{
+         <input type="text" placeholder="dd-mm-yyyy" name="birth" value="{{
           request.form.birth }}"> <br>
 <!--          в специальную таблицу-->
-          <input type="text" placeholder="Condition" name="Condition" required value="{{
+          <input type="text" placeholder="Condition" name="condition" required value="{{
           request.form.condition }}"> <br>
-          <input type="text" placeholder="Diagnosis" name="Diagnosis" required value="{{
+          <input type="text" placeholder="Diagnosis" name="diagnosis" required value="{{
           request.form.diagnosis }}"> <br>
-          <input type="text" placeholder="Phone" name="Phone" required value="{{
-          request.form.phone }}"> <br>
-          <input type="text" placeholder="Second phone" name="Second phone"  value="{{
-          request.form.second_phone }}"> <br>
-          <input type="text" placeholder="TG id" name="TG id"  value="{{
+          <input type="text" placeholder="Phone" name="phone_main" required value="{{
+          request.form.phone_main }}"> <br>
+          <input type="text" placeholder="Second phone" name="phone_secondary"  value="{{
+          request.form.phone_secondary }}"> <br>
+          <input type="text" placeholder="TG id" name="tg_id"  value="{{
           request.form.tg_id }}"> <br>
-          <input type="text" placeholder="Email" name="Email"  value="{{
+          <input type="text" placeholder="Email" name="email"  value="{{
           request.form.email }}"> <br>
-          <input type="text" placeholder="Profession" name="Profession"  value="{{
-          request.form.profession }}"> <br>
-          <input type="text" placeholder="Hobbies" name="Hobbies"  value="{{
+          <input type="text" placeholder="Profession" name="position"  value="{{
+          request.form.position }}"> <br>
+          <input type="text" placeholder="Hobbies" name="hobbies"  value="{{
           request.form.hobbies }}"> <br>
-          <input type="text" placeholder="Comment" name="Comment"  value="{{
+          <input type="text" placeholder="Comment" name="comment"  value="{{
           request.form.comment }}"> <br>
         <input class="btn btn-default" type="submit" value="Create client">
       </form>
