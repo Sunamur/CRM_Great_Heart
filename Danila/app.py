@@ -39,9 +39,32 @@ def welcome():
 # @login_required
 def client_registration():
     if request.method == 'POST':
-        print(request.form['Name'])
+        vals = request.form.to_dict()
+        client_dict = {}
+
+        for (key, value) in vals.items():
+            # Check if key is even then add pair to new dictionary
+            if (value != '') :
+                client_dict[key] = value
+
+
+        cols = list(client_dict.keys())
+        cols = ", ".join(list(cols))
+        vals = list(client_dict.values())
+        vals = ", ".join(list(vals))
+        q = f'''
+        Insert into clients ({cols})
+        values ({vals})
+        '''
+        with engine.connect() as con:
+            con.execute(q)
+
     return render_template('client_registration.html')  # render a template
 
+'''
+Insert into clients
+values (DEFAULT, {vals})
+'''
 
 with engine.connect() as con:
     res_logins = con.execute('SELECT * FROM logins')
