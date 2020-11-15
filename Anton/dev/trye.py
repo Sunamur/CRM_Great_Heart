@@ -30,9 +30,6 @@ User = base.classes.users
 
 ses = Session(bind=engine)
 
-say = ses.query(User).first()
-print(say.email_personal)
-
 # connection = engine.connect()
 # connection.close()
 # engine.dispose()
