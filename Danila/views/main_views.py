@@ -266,3 +266,35 @@ def benfactor_registration():
             con.execute(benfactor_q)
             con.execute(benefactor_category_q)
     return render_template('benfactor_registration.html')  # render a template
+
+@main_blueprint.route('/benefactor_query/', methods=['GET', 'POST'])
+# @login_required
+def benefactor_query():
+    if request.method == 'POST':
+        vals = request.form.to_dict()
+        clients_query_dict = {}
+        for (key, value) in vals.items():
+            if (value != '') :
+                clients_query_dict[key] = value
+        cols = list(clients_query_dict.keys())
+        cols = ", ".join(list(cols))
+        vals = list(clients_query_dict.values())
+        for i in range(len(vals)):
+            if isinstance(vals[i], str):
+                vals[i] = "'" + vals[i] + "'"
+        vals = ", ".join(list(vals))
+        # print(vals)
+        benfactor_query_q = f'''
+                Insert into benefactor_queries (query_timestamp, query_date, query_status_updated_at, query_coordinator, query_executor, {cols})
+        values(
+        now()
+        , date(now())
+        , now()
+        , -1
+        , -1
+        , {vals}
+        )
+                '''
+        with db.connect() as con:
+            con.execute(benfactor_query_q)
+    return render_template('benefactor_query.html')  # render a template
