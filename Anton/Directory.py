@@ -1,3 +1,5 @@
+#!/usr/local/bin/python2.7
+# -*- coding: utf-8 -*-
 import os, time, datetime
 from flask import Flask, flash, url_for, redirect, render_template, request, session, abort, send_from_directory, send_file, Response
 from flask_sqlalchemy import SQLAlchemy
@@ -13,6 +15,9 @@ import json
 from sqlalchemy.orm import sessionmaker
 import sqlite3
 import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 
 
 
@@ -298,4 +303,4 @@ def security_context_processor():
 
 if __name__ == "__main__":
     app.secret_key = os.urandom(100)
-    app.run(debug=True,host='127.0.0.1', port=5000)
+    app.run(debug=True,host='0.0.0.0', port=5000)
