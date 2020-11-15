@@ -74,13 +74,28 @@ def users_table():
               ('position', 'Профессия'),
               ('hobbies', 'Хобби'),
               ('comment', 'Комментарий')]
-
-    return render_template('base_table.html', values=fields, who='членов', margin_left=-200)  # render a template
+    with db.connect() as con:
+        query = con.execute("""select name, surname, birth_date, city, phone_personal, phone_work,
+                                 work_place, position_fund, education, education_minor, languages,
+                                 tg_id, email_personal, position, hobbies, comment from users""")
+        table = query.fetchall()
+    return render_template('base_table.html', values=fields, who='членов', margin_left=-200, db_table=table)  # render a template
 
 @main_blueprint.route('/sponsors', methods=['GET', 'POST'])
 @login_required
 def sponsors_table():
-    return render_template('base_table.html')  # render a template
+    fields = [('name', 'Имя/название'), 
+              ('phone', 'Контактный телефон'),
+              ('email', 'Email'),
+              ('payment_details', 'Реквизиты'),
+              ('socials', 'Социальные сети'),
+              ('website', 'Сайт'),
+              ('category', 'Тип'),
+              ('comment', 'Комментарий'),]
+    with db.connect() as con:
+        query = con.execute("""select name, phone, email, payment_details, socials, website, category, comment from sponsors""")
+        table = query.fetchall()
+    return render_template('base_table.html', values=fields, who='спонсоров', margin_left=0, db_table=table)  # render a template
 
 @main_blueprint.route('/slaves', methods=['GET', 'POST'])
 @login_required
@@ -97,12 +112,27 @@ def slaves_table():
               ('position', 'Профессия'),
               ('hobbies', 'Хобби'),
               ('comment', 'Комментарий')]
-    return render_template('base_table.html', values=fields, who='подопечных', margin_left=0)  # render a template
+    with db.connect() as con:
+        query = con.execute("""select name, surname, birth, diagnosis, condition, 
+                                phone_main, phone_secondary, tg_id, email, position, hobbies, comment from clients""")
+        table = query.fetchall()
+    return render_template('base_table.html', values=fields, who='подопечных', margin_left=0, db_table=table)  # render a template
 
 @main_blueprint.route('/partners', methods=['GET', 'POST'])
 @login_required
 def partners_table():
-    return render_template('base_table.html')  # render a template
+    fields = [('name', 'Имя/название'), 
+              ('phone', 'Контактный телефон'),
+              ('email', 'Email'),
+              ('payment_details', 'Реквизиты'),
+              ('socials', 'Социальные сети'),
+              ('website', 'Сайт'),
+              ('comment', 'Комментарий'),]
+
+    with db.connect() as con:
+        query = con.execute("""select name, phone, email, payment_details, socials, website, comment from partners""")
+        table = query.fetchall()
+    return render_template('base_table.html', values=fields, who='партнёров', margin_left=0, db_table=table)  # render a template
 
 
 

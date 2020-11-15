@@ -20,9 +20,13 @@
             </tr>
         </thead>
         <tbody>
+            {% for row in db_table %}
             <tr>
-                <!-- Лёнь, вставь сюда данные -->
+                {% for field in row %}
+                    <td>{{field}}</td>
+                {% endfor %}
             </tr>
+            {% endfor %}
         </tbody>
 
     </table>
