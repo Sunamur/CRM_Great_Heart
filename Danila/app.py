@@ -57,11 +57,14 @@ with engine.connect() as con:
 def login():
     error = None
     if request.method == 'POST':
-        if (request.form['username'] in logins) & (passwords[logins.index(request.form['username'])] == request.form['password']):
-            session['logged_in'] = True
-            flash('You were logged in')
-            return redirect(url_for('home'))
-        else:  error = 'Invalid Credentials. Please try again.'
+        try:
+            if (request.form['username'] in logins) & (passwords[logins.index(request.form['username'])] == request.form['password']):
+                session['logged_in'] = True
+                flash('You were logged in')
+                return redirect(url_for('home'))
+            else:  error = 'Invalid Credentials. Please try again.'
+        except Exception:
+            error = 'There has been an error. Try again?'
         # if request.form['username'] not in logins or request.form['password'] != 'admin':
         #
         # else:
