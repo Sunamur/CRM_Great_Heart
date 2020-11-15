@@ -10,9 +10,9 @@ main_blueprint = Blueprint('main', __name__, template_folder='templates')
 def home():
     return render_template('index.html')
 
-@main_blueprint.route('/welcome/')
-def welcome():
-    return render_template('welcome.html')
+# @main_blueprint.route('/welcome/')
+# def welcome():
+#     return render_template('welcome.html')
 
 @main_blueprint.route('/client_registration/', methods=['GET', 'POST'])
 @login_required
@@ -38,7 +38,40 @@ def client_registration():
         with db.connect() as con:
             con.execute(q)
 
-    return render_template('client_registration.html')  # render a template
+    fields = [('name', "Иван", 'Имя', True), 
+              ('surname', "Иванов", 'Фамилия', True), 
+              ('birthdate', "01-01-2020", 'Дата рождения', True),
+              ('diagnosis', "Поступил на ФТиАД", 'Диагноз', True),
+              ('condition', "Учится на ФТиАД", 'Состояние', True),
+              ('phone_main', "+7-800-555-35-35", 'Основной телефон для связи', True),
+              ('phone_secondary', "+7-999-999-99-99", 'Дополнительный телефон для связи', False),
+              ('tg_id', "@pupa_and_lupa", 'Контакт в Телеграм', False),
+              ('email', "ivanov_ivan@mail.ru", 'Email', False),
+              ('position', "Подрочист", 'Профессия', False),
+              ('hobbies', "Любит писать CRM за еду", 'Хобби', False),
+              ('comment', "Любит ванильный кофе", 'Комментарий', False)]
+
+    return render_template('client_registration.html', values=fields)  # render a template
+
+@main_blueprint.route('/users', methods=['GET', 'POST'])
+@login_required
+def users_table():
+    return render_template('users.html')  # render a template
+
+@main_blueprint.route('/users', methods=['GET', 'POST'])
+@login_required
+def sponsors_table():
+    return render_template('sponsors.html')  # render a template
+
+@main_blueprint.route('/slaves', methods=['GET', 'POST'])
+@login_required
+def slaves_table():
+    return render_template('slaves.html')  # render a template
+
+@main_blueprint.route('/partners', methods=['GET', 'POST'])
+@login_required
+def partners_table():
+    return render_template('partners.html')  # render a template
 
 
 
@@ -63,8 +96,8 @@ def login():
 @login_required
 def logout():
     session.pop('logged_in', None)
-    flash('You were logged out.')
-    return redirect(url_for('main.welcome'))
+    # flash('You were logged out.')
+    return redirect(url_for('main.home'))
 
 
 @main_blueprint.route('/client_query/', methods=['GET', 'POST'])
