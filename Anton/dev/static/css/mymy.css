@@ -1,0 +1,90 @@
+
+
+
+.cdr {
+	margin:0 auto;
+	border-width:0;
+	width: 100%;
+	font-size: 0.9em;
+}
+
+.cdr fieldset {
+	border-radius: 10px;
+	background-color: rgba(184, 240, 255, 0.2);
+	border: 1px solid #B8F0FF;
+}
+
+
+.cdr th, .total td {
+	background-color: #337ab7;
+	text-align:center;
+	box-shadow: 0 0 2px #85CDE1 inset;
+	border-radius:5px;
+	color:#ffffff;
+	padding:10px;
+}
+
+.total td {
+	font-weight: 700;
+}
+
+.cdr .center_col {
+	width:78%;
+	padding:2px;
+}
+
+
+.cdr .end_col {
+	width:11%;
+	padding:3px;
+	text-align:center;
+}
+
+.cdr .chart_data {
+	width:3%;
+	padding:1px;
+	text-align:center;
+}
+
+
+.cdr .img_col {
+	width:16px;
+	height:16px;
+}
+
+legend.title {
+	color: #20BCE7;
+}
+
+
+.title, .title a {
+	color: #777;
+	font-size: 1em;
+	font-weight: bold;
+}
+
+
+.record {
+	background-color:#fff;
+	empty-cells:hide;
+}
+
+.record  td {
+	text-align:left;
+	padding:3px 3px 3px 10px;
+}
+
+
+.record:hover {
+	background: #E3FFFE;
+	color:#000;
+	empty-cells:hide;
+}
+
+
+.record_col {
+	padding-left:2px;
+	padding-right:2px;
+	border-width:0;
+
+}

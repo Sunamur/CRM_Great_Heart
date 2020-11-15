@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+{% block body %}
+    <nav align = "wright" style="margin-left:30" >	
+		<img src="/static/phone-book-th.png" alt="упс..." style="margin-right:20">
+		<font size="5" >Телефонный справочник</font>
+		<a class="btn btn-primary" href="{{ url_for('services') }}" style="margin-left:20">Сервисные номера</a>
+	</nav>
+<div style= "margin:30">
+	 <!-- NEW FORM -->
+	<form action="{{ url_for('select') }}" method="POST">
+		<div> 
+			{{ form.autocomp.label }}: {{ form.autocomp(size=50) }}
+				<script>
+					$(function() {
+						$.ajax({
+							url: '{{ url_for("autocomplete") }}'
+							}).done(function (data){
+								$('#city_autocomplete').autocomplete({
+									source: data,
+									minLength: 1
+								});
+							});
+						});
+				</script>
+			<select name="PAO">
+							<option value='Все'><b>Поиск по всем подразделениям</b></option>
+							<option value='Киев'>Киев</option>
+							<option value='Львов'>Львов</option>
+							<option value='Лондон'>Лондон</option>
+			</select>
+		</div>
+
+      <div class="form-group"> <!-- Submit button -->
+        <button class="btn btn-primary " name="submit" type="submit" onclick="$('#loading').show();">Поиск</button>
+      </div>
+									
+	</form>
+
+<h3  style="color:#337ab7" align = "Left">Результаты поиска</h3>
+<table class = "cdr">
+<tr class="cdr">
+  <th class="record_col">Имя</th>
+  <th class="record_col">Подразделение</th>
+  <th class="record_col">Должность</th>
+  <th class="record_col">Внутр.</th>
+  <th class="record_col">Моб.</th>
+  <th class="record_col">email</th>
+  <th class="record_col">Подробно</th>
+ </tr>
+{% for row in data %}
+    <tr  class="record">
+	{% for d in row %}
+	{% set count = loop.index %}
+		{% if count == 6 %}
+			<td class ="record_col"><a href=mailto:{{ d }}>{{ d }}</td>
+		{% elif count == 7 %}
+			<td class ="record_col"><a href=/detail/{{d }} target="_blank" title="Подробно">Подробно</td>
+		{% else %}
+			<td class ="record_col">{{ d }}</td>
+		{% endif %}
+	{% endfor %}
+    </tr>
+{% endfor %}
+
+
+
+
+<div id="loading" style="display:none;"><img src="static/loadingimage.gif" alt="" /></div>
+ 
+<div id="footer">
+
+</div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

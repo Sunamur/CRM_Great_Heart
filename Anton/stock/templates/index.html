@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% block body %}
+    <nav align = "wright" style="margin-left:30">	
+		<img src="/static/phone-book-th.png" alt="упс..." style="margin-right:20">
+		<font size="5" >Телефонный справочник</font>
+		<a class="btn btn-primary" href="{{ url_for('services') }}" style="margin-left:20">Сервисные номера</a> 	
+	</nav>
+<div style= "margin:30;">
+	 <!-- NEW FORM -->
+	<form action="{{ url_for('select') }}" method="POST">
+		<div> 
+			{{ form.autocomp.label }}: {{ form.autocomp(size=50) }}
+				<script>
+					$(function() {
+						$.ajax({
+							url: '{{ url_for("autocomplete") }}'
+							}).done(function (data){
+								$('#city_autocomplete').autocomplete({
+									source: data,
+									minLength: 1
+								});
+							});
+						});
+				</script>
+			<select name="PAO">
+							<option value='Все'><b>Поиск по всем подразделениям</b></option>
+							<option value='Киев'>Киев</option>
+							<option value='Львов'>Львов</option>
+							<option value='Лондон'>Лондон</option>
+			</select>
+		</div>
+
+      <div class="form-group"> <!-- Submit button -->
+        <button class="btn btn-primary " name="submit" type="submit" onclick="$('#loading').show();">Поиск</button>
+      </div>
+									
+	</form>
+
+<div id="loading" style="display:none;"><img src="static/loadingimage.gif" alt="" /></div>
+ 
+ 
+
+
+<div id="footer">
+
+</div>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+

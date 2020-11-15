@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block body %}
+    <nav align = "wright" style="margin-left:30" >	
+		<img src="/static/phone-book-th.png" alt="упс..." style="margin-right:20">
+		<font size="5" >Телефонный справочник</font><br>
+		<a class="btn btn-primary" href="{{ url_for('home') }}" style="margin-left:20">Назад к поиску</a>  
+
+	</nav>
+<div style= "margin:30">
+	<h3  style="color:#337ab7" align = "Left">Сервисные номера</h3>
+<table class = "cdr">
+	<tr class="cdr">
+	  <th class="record_col">Сервисный номер</th>
+	  <th class="record_col">Назначение</th>
+	  <th class="record_col">Учасники обработки обращений</th>
+	</tr>
+	<tr  class="record">
+		<td class="record_col">5000</td>
+		<td class="record_col">Главы предприятий</td>
+		<td class="record_col">
+			{% for d in srv_5000 %}
+				{{ d }}<br>
+			{% endfor %}
+		</td>
+	</tr>
+	<tr  class="record">
+		<td class="record_col">5001</td>
+		<td class="record_col">Входящая линия продаж</td>
+		<td class="record_col">
+			{% for d in srv_5001 %}
+				{{ d }}<br>
+			{% endfor %}
+		</td>
+	</tr>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+
