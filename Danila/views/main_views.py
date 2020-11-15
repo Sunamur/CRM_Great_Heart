@@ -156,3 +156,42 @@ def all_client_queries():
     df = pd.DataFrame(vals, columns = keys)
     df.to_html('/Users/danilaukader/CRM_Great_Heart/Danila/templates/all_client_queries.html')
     return render_template('all_client_queries.html')
+
+
+@main_blueprint.route('/benfactor_registration/', methods=['GET', 'POST'])
+# @login_required
+def benfactor_registration():
+    if request.method == 'POST':
+        vals = request.form.to_dict()
+        clients_query_dict = {}
+        for (key, value) in vals.items():
+            if (value != '') :
+                clients_query_dict[key] = value
+
+        cols = list(clients_query_dict.keys())
+        cols.pop()
+        cols = ", ".join(list(cols))
+        vals = list(clients_query_dict.values())
+        for i in range(len(vals)):
+            if isinstance(vals[i], str):
+                vals[i] = "'" + vals[i] + "'"
+        benefactor_category = vals.pop()
+
+        vals = ", ".join(list(vals))
+        benfactor_q = f'''
+                Insert into benefactor (created_at, updated_at,  {cols})
+        values(
+        now()
+        , now()
+        , {vals}
+        )
+                '''
+        benefactor_category_q = f"""
+        insert into benefactor_category (created_at, updated_at, category)
+        values (now(), now(), {benefactor_category})
+        """
+
+        with db.connect() as con:
+            con.execute(benfactor_q)
+            con.execute(benefactor_category_q)
+    return render_template('benfactor_registration.html')  # render a template
