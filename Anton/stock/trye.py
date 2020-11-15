@@ -1,41 +1,23 @@
 import os, time, datetime
 from flask import Flask, flash, url_for, redirect, render_template, request, session, abort, send_from_directory, send_file, Response
-from flask_sqlalchemy import SQLAlchemy as flask_sqlalchemy
-import sqlalchemy
-from sqlalchemy.orm import Session
-from sqlalchemy.ext.automap import automap_base
+from flask_sqlalchemy import SQLAlchemy
 from flask_security import Security, SQLAlchemyUserDatastore, \
     UserMixin, RoleMixin, login_required, current_user
 from flask_security.utils import encrypt_password
 import flask_admin
 from flask_admin.contrib import sqla
 from flask_admin import helpers as admin_helpers
-from wtforms.validators import DataRequired, URL
+from wtforms.validators import DataRequired
 from wtforms import TextField, Form, SubmitField, SelectField
 import json
+from sqlalchemy.orm import sessionmaker
+import sqlite3
 import enum
-import psycopg2
 
 # Create Flask application
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
-db = flask_sqlalchemy(app)
-
-base = automap_base()
-
-engine = db.create_engine('postgres://obcayovm:ItiplxDZiHmnUo_7WdFtv3M67FcW1sCM@hattie.db.elephantsql.com:5432/obcayovm', {})
-
-base.prepare(engine, reflect=True)
-User = base.classes.users
-
-ses = Session(bind=engine)
-
-say = ses.query(User).first()
-print(say.email_personal)
-
-# connection = engine.connect()
-# connection.close()
-# engine.dispose()
+db = SQLAlchemy(app)
 
 class SearchForm(Form):
     autocomp = TextField(u"Введите имя", id='city_autocomplete')
@@ -45,12 +27,13 @@ class SearchForm(Form):
 # Define models
 roles_users = db.Table(
     'roles_users',
-    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
-    db.Column('role_id', db.Integer(), db.ForeignKey('roles.user_id'))
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
 )
 
+
 class Role(db.Model, RoleMixin):
-    user_id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
 
@@ -58,25 +41,20 @@ class Role(db.Model, RoleMixin):
         return self.name
 
 
-class Users(db.Model, UserMixin):
+class User(db.Model, UserMixin):
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
-    login = db.Column(db.String(20), unique=True)
-    name = db.Column(db.String(255))
-    surname = db.Column(db.String(255))
-    birth_date = db.Column(db.String(10))
-    city = db.Column(db.String(20), unique=False, nullable=False, default='')
-    phone_personal = db.Column(db.String(20), unique=False, nullable=False, default='')
-    # email = db.Column(db.String(255), unique=True)
-    email_personal = db.Column(db.String(255), unique=True)
+    first_name = db.Column(db.String(255))
+    last_name = db.Column(db.String(255))
+    email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255))
-
     active = db.Column(db.Boolean())
-    # roles = db.relationship('Role', secondary=roles_users,
-    #                         backref=db.backref('users', lazy='dynamic'))
+    roles = db.relationship('Role', secondary=roles_users,
+                            backref=db.backref('users', lazy='dynamic'))
     
 
     def __str__(self):
-        return self.email_personal
+        return self.email
 
 class slaves_state_Enum(enum.Enum):
     heavy = 'heavy'
@@ -131,6 +109,7 @@ class Partners(db.Model):
 
 class Sponsor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     type = db.Column(db.Enum(partner_type_Enum), unique=False, nullable=False, default='')
     reg_requisites= db.Column(db.String(100), unique=False, nullable=False, default='')
@@ -173,7 +152,7 @@ class Event(db.Model):
 
 
 # Setup Flask-Security
-user_datastore = SQLAlchemyUserDatastore(engine, Users, Role)
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
 
@@ -229,28 +208,41 @@ class DirReg_ALL_ModVw(sqla.ModelView):
                 # login
                 return redirect(url_for('security.login', next=request.url))
 
+
+    column_exclude_list = ['position', 'int_2', 'int_3', 'mob_2', 'mob_3', 'viber', 'telegram', 'whatsup', 'srv_2', 'srv_3',
+                           'home', 'fax', 'skype']
     # create_modal = True
     # edit_modal = True
     # can_export = True
     page_size = 50
-    column_searchable_list = ('fullname', 'phone_1')
+    column_searchable_list = ('fullname', 'int_1')
     column_default_sort = 'fullname'
-    column_labels = dict(fullname="Имя", profession='Профессия', phone_1='Основной', phone_2='Дополнительный', city='Город')
+    column_labels = dict(fullname="Имя", company='Подразделение', int_1='Внутр.', mob_1='Моб.', city='Городской',
+                         srv_1='Сервисный')
     form_args = {
         'fullname': {'label': "Имя", 'validators': [DataRequired()]},
-        'profession': {'label': 'Профессия'},
-        'phone_1': {'label': "Внутренний номер телефона №1"},
-        'phone_2': {'label': "Внутренний номер телефона №2"},
-        'city': {'label': "Город"}
+        'position': {'label': 'Должность'},
+        'company': {'label': 'Подразделение'},
+        'int_1': {'label': "Внутренний номер телефона №1"},
+        'int_2': {'label': "Внутренний номер телефона №2"},
+        'int_3': {'label': "Внутренний номер телефона №3"},
+        'mob_1': {'label': "Мобильный номер телефона №1"},
+        'mob_2': {'label': "Мобильный номер телефона №2"},
+        'mob_3': {'label': "Мобильный номер телефона №3"},
+        'city': {'label': "Городской номер телефона"},
+        'srv_1': {'label': "Сервисный номер телефона №1"},
+        'srv_2': {'label': "Сервисный номер телефона №2"},
+        'srv_3': {'label': "Сервисный номер телефона №3"},
+        'home': {'label': "Домашний номер телефона"}
     }
-    # form_choices = {
-    #     'company': [
-    #         ('', '-'),
-    #         ('Киев', 'Киев'),
-    #         ('Львов', 'Львов'),
-    #         ('Лондон', 'Лондон'),
-    #     ]
-    # }
+    form_choices = {
+        'company': [
+            ('', '-'),
+            ('Киев', 'Киев'),
+            ('Львов', 'Львов'),
+            ('Лондон', 'Лондон'),
+        ]
+    }
 
 
 
@@ -275,58 +267,50 @@ def home():
 
 @app.route('/select', methods=['GET', 'POST'])
 def select():
-    # name = request.form.get('autocomp')
-    # PAO = request.form.get('PAO')
-    # if name == None:
-    #     return redirect('/')
-    # if name == "" and PAO == "Все":
-    #     return redirect('/')
-    # elif name != "" and PAO != "Все":
-    #     query = 'SELECT name, surname, diagnosis, position, int_1, mob_1, email, id from  where fullname like "' + name + '%" and company = "' + PAO + '" ORDER BY fullname'
-    # elif name == "" and PAO != "Все":
-    #     query = 'SELECT fullname, company, position,int_1, mob_1, email, id  from Slaves where company = "' + PAO + '" ORDER BY fullname'
-    # elif name != "" and PAO == "Все":
-    #     query = 'SELECT fullname, company, position, int_1, mob_1, email, id from Slaves where fullname like "' + name + '%" ORDER BY fullname'
-    # else:
-    #     return redirect('/')
-    query = 'SELECT fullname, company, position from users'
-    try: 
-        # connection = psycopg2.connect(user = 'obcayovm',
-        #                               password = 'ItiplxDZiHmnUo_7WdFtv3M67FcW1sCM',
-        #                               port = '5432', 
-        #                               host = 'hattie.db.elephantsql.com')
-        cursor = engine.cursor()
-        cursor.execute(query)
-        records = cursor.fetchall()
-        cursor.close()
-        # connection.close()      
+    name = request.form.get('autocomp')
+    PAO = request.form.get('PAO')
+    if name == None:
+        return redirect('/')
+    if name == "" and PAO == "Все":
+        return redirect('/')
+    elif name != "" and PAO != "Все":
+        query = 'SELECT fullname, company, position, int_1, mob_1, email, id from Slaves where fullname like "' + name + '%" and company = "' + PAO + '" ORDER BY fullname'
+    elif name == "" and PAO != "Все":
+        query = 'SELECT fullname, company, position,int_1, mob_1, email, id  from Slaves where company = "' + PAO + '" ORDER BY fullname'
+    elif name != "" and PAO == "Все":
+        query = 'SELECT fullname, company, position, int_1, mob_1, email, id from Slaves where fullname like "' + name + '%" ORDER BY fullname'
+    else:
+        return redirect('/')
+    # return query
+    try:
+        con = sqlite3.connect('Directory.db')
+        cur = con.cursor()
+        cur.execute(query)
+        data = cur.fetchall()
+        con.close()
         form = SearchForm(request.form)
-        return render_template('formselect.html', form=form, data=records)
-    except (Exception, psycopg2.Error) as error :
-        print ("Error while connecting to PostgreSQL", error)
+        return render_template('formselect.html', form=form, data=data)
+    except Exception as e:
+        return (str(e))
 
 
 ################## Detail
 @app.route("/detail/<id>", methods=['GET', 'POST'])
 def detail(id):
-    query = 'SELECT * from clients where id = "' + id + '"'
+    query = 'SELECT * from directory where id = "' + id + '"'
     try:
-        # connection = psycopg2.connect(user = 'obcayovm',
-        #                               password = 'ItiplxDZiHmnUo_7WdFtv3M67FcW1sCM',
-        #                               port = '5432', 
-        #                               host = 'hattie.db.elephantsql.com')
-        cursor = engine.cursor()
-        cursor.execute(query)
-        records = cursor.fetchall()
-        cursor.close()
-        # connection.close()
+        con = sqlite3.connect('Directory.db')
+        cur = con.cursor()
+        cur.execute(query)
+        data = cur.fetchall()
+        con.close()
 
         laa = []
-        for i in records:
+        for i in data:
             for x in i:
                 laa.append(str(x))
         sname = laa[1]
-        return render_template('detail.html', sname=sname, data=records)
+        return render_template('detail.html', sname=sname, data=data)
     except Exception as e:
         return (str(e))
 
@@ -345,7 +329,7 @@ admin = flask_admin.Admin(
 
 # model views для Администрирования
 admin.add_view(superuser_ModVw(Role, db.session))
-admin.add_view(superuser_ModVw(Users, db.session))
+admin.add_view(superuser_ModVw(User, db.session))
 # model view для Всей таблици
 admin.add_view(DirReg_ALL_ModVw(Slaves, db.session))
 
@@ -363,4 +347,4 @@ def security_context_processor():
 
 if __name__ == "__main__":
     app.secret_key = os.urandom(100)
-    app.run(debug=True,host='127.0.0.1', port=5000)
+    app.run(debug=False,host='127.0.0.1', port=5000)
