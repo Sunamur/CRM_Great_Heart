@@ -97,7 +97,7 @@ def client_query():
         ,{vals}
         )
                 '''
-        with engine.connect() as con:
+        with db.connect() as con:
             q_r = con.execute(id)
             client_id = q_r.first().values()
             if client_id != None:
