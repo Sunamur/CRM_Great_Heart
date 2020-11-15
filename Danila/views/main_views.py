@@ -75,12 +75,12 @@ def users_table():
               ('hobbies', 'Хобби'),
               ('comment', 'Комментарий')]
 
-    return render_template('users.html', values=fields)  # render a template
+    return render_template('base_table.html', values=fields, who='членов', margin_left=-200)  # render a template
 
 @main_blueprint.route('/sponsors', methods=['GET', 'POST'])
 @login_required
 def sponsors_table():
-    return render_template('sponsors.html')  # render a template
+    return render_template('base_table.html')  # render a template
 
 @main_blueprint.route('/slaves', methods=['GET', 'POST'])
 @login_required
@@ -97,12 +97,12 @@ def slaves_table():
               ('position', 'Профессия'),
               ('hobbies', 'Хобби'),
               ('comment', 'Комментарий')]
-    return render_template('slaves.html', values=fields)  # render a template
+    return render_template('base_table.html', values=fields, who='подопечных', margin_left=0)  # render a template
 
 @main_blueprint.route('/partners', methods=['GET', 'POST'])
 @login_required
 def partners_table():
-    return render_template('partners.html')  # render a template
+    return render_template('base_table.html')  # render a template
 
 
 

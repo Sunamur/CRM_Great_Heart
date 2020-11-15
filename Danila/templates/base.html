@@ -26,36 +26,38 @@
         </div> -->
 <header>
         <nav class="navbar navbar-default navbar-sticky-top">
-            <div class="container">
+            <div class="container-fluid">
               <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse"></button>
                 <a class="navbar-brand" href="/">Great Heart</a>
               </div>
               
               {% if session['logged_in'] %}
+                
               <div class="collapse navbar-collapse" id="navbar-collapse">
                 <ul class="nav navbar-nav">
-                  <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                        Таблицы<span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu" role="menu">
-                      <li><a href="/slaves">Подопечные</a></li>
-                      <li><a href="/users">Пользователи</a></li>
-                      <li><a href="/sponsors">Спонсоры</a></li>
-                      <li><a href="/partners">Партнёры</a></li>
-                    </ul>
+                  <li>
+                    <a href="/users">Пользователи</a>
+                  </li>
+                  <li>
+                    <a href="/slaves">Подопечные</a>
+                  </li>
+                  <li>
+                    <a href="/sponsors">Спонсоры</a>
+                  </li>
+                  <li>
+                    <a href="/partners">Партнёры</a>
                   </li>
                 </ul>
                 <form class="navbar-form navbar-right" role="search" action="/logout">
                   <button type="submit" class="btn btn-default">Logout</button>
                 </form>
               </div>
+                
               {% endif %}
             </div>
           </nav>
         </header>
-        <hr class="no-margins"/>
         <div id="main-div" class="with-margins">
         <style>
           div.with-margins {
