@@ -1,43 +1,39 @@
 {% extends "base.html" %}
-
-
 {% block bonus_title %} New client {% endblock %}
-
 {% block content %}
+<style>
+div.with-margins {
+  margin-top: 50px;
+}
+
+div.form-group {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+input.form-control {
+  width: 50%;
+}
+
+textarea {
+  resize: none
+}
+
+</style>
+
     <div class="container">
-      <h1>Client registraion form</h1>
-      <br>
-      <form action="" method="post">
-        <input type="text" placeholder="Name" name="name" required value="{{
-          request.form.name }}"> <br>
-          <input type="text" placeholder="Surname" name="surname" required value="{{
-          request.form.surname }}"> <br>
-         <input type="text" placeholder="dd-mm-yyyy" name="birth" value="{{
-          request.form.birth }}"> <br>
-          <input list="Condition" name="condition"><br>
-          <datalist id="Condition">
-            <option value="Healthy">
-            <option value="Disease diagnosed">
-            <option value="Treatment">
-            <option value="Rehabilitation">
-            <option value="Remission">
-          </datalist>
-          <input type="text" placeholder="Diagnosis" name="diagnosis" required value="{{
-          request.form.diagnosis }}"> <br>
-          <input type="text" placeholder="Phone" name="phone_main" required value="{{
-          request.form.phone_main }}"> <br>
-          <input type="text" placeholder="Second phone" name="phone_secondary"  value="{{
-          request.form.phone_secondary }}"> <br>
-          <input type="text" placeholder="TG id" name="tg_id"  value="{{
-          request.form.tg_id }}"> <br>
-          <input type="text" placeholder="Email" name="email"  value="{{
-          request.form.email }}"> <br>
-          <input type="text" placeholder="Profession" name="position"  value="{{
-          request.form.position }}"> <br>
-          <input type="text" placeholder="Hobbies" name="hobbies"  value="{{
-          request.form.hobbies }}"> <br>
-          <input type="text" placeholder="Comment" name="comment"  value="{{
-          request.form.comment }}"> <br>
+      <h1>Регистрация нового подопечного</h1>
+      <form action method="post" role="form" class='form-horizontal'>
+        
+        {% for name, placeholder, placeholder_name, is_strong in values %}
+          <div class="form-group">
+            <label for={{name}} class="col-md-2 control-label">{{placeholder_name}}{% if is_strong %}<strong style="color: red">*</strong>{% endif %}</label>
+            <div class="col-md-10">
+              <input class="form-control" id={{name}} name={{name}} type="text" placeholder={{placeholder}} value>
+            </div>
+          </div>
+        {% endfor %}
+
         <input class="btn btn-default" type="submit" value="Create client">
       </form>
       {% if error %}
