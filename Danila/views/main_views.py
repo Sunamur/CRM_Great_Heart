@@ -60,7 +60,7 @@ def client_registration():
 def users_table():
     return render_template('users.html')  # render a template
 
-@main_blueprint.route('/users', methods=['GET', 'POST'])
+@main_blueprint.route('/sponsors', methods=['GET', 'POST'])
 @login_required
 def sponsors_table():
     return render_template('sponsors.html')  # render a template
@@ -156,3 +156,47 @@ def all_client_queries():
     df = pd.DataFrame(vals, columns = keys)
     df.to_html('/Users/danilaukader/CRM_Great_Heart/Danila/templates/all_client_queries.html')
     return render_template('all_client_queries.html')
+
+
+@main_blueprint.route('/clients/<int:uid>/', methods=['GET'])
+@login_required
+def client_card(uid):
+    client_data = get_people_info(uid, 'clients')
+    client_fields = [
+        ["id","ID"],
+        ["name","Имя"],
+        ["surname","Фамилия"],
+        ["birth","Дата рождения"],
+        ["condition","Состояние"],
+        ["diagnosis","Диагноз"],
+        ["phone_main","Основной телефон"],
+        ["phone_secondary","Дополнительный телефон"],
+        ["tg_id","Telegram"],
+        ["email","Email"],
+        ["position","Статус"],
+        ["hobbies","Хобби"],
+        ["comment","Комментарий"],
+        ["created_at","Создано"],
+        ["updated_at","Обновлено"],]
+
+    if client_data is None:
+        return render_template('no user')
+    if len(client_fields)!=len(client_data):
+        return render_template('schema error')
+    payload = [[fieldname,pretty_name,data] for [fieldname,pretty_name],data in zip(client_fields, client_data)]
+    name = ' '.join([client_data[1], client_data[2]])
+
+    return render_template('base_card.html', values=payload, name=name, kind='Client')
+
+
+def get_people_info(uid, table='clients'):
+
+
+    qry = f'select id from {table} where id={uid}'
+    with db.connect() as con:
+        q_r = con.execute(qry)
+        client_id = q_r.first().values()
+        if client_id == None:
+            return None
+        res = con.execute(f'select * from {table} where id={uid}').first().values()
+        return res

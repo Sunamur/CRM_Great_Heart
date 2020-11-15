@@ -1,0 +1,25 @@
+
+{% extends "base.html" %}
+
+
+{% block bonus_title %} {{name}} | {{kind}} card
+{% endblock %}
+{% block content %}
+
+<h3>{{name}}</h3>
+<p></p>
+
+<table>
+<tbody>
+{% for fieldname,pretty_name,data in values%}
+    <tr>
+        <td><b>{{ pretty_name }}</b></td>
+        <td>{{ data }}</td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+
+{% block actions %}{% endblock %}
+
+{% endblock %}
