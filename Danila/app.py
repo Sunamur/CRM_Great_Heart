@@ -21,7 +21,7 @@ def login_required(f):
         if 'logged_in' in session:
             return f(*args, **kwargs)
         else:
-            flash('You need to login first.')
+            # flash('You need to login first.')
             return redirect(url_for('login'))
     return wrap
 
@@ -30,10 +30,6 @@ def login_required(f):
 @login_required
 def home():
     return render_template('index.html')  # render a template
-
-@app.route('/welcome/')
-def welcome():
-    return render_template('welcome.html')  # render a template
 
 @app.route('/client_registration/', methods=['GET', 'POST'])
 # @login_required
@@ -83,7 +79,7 @@ def login():
         try:
             if (request.form['username'] in logins) & (passwords[logins.index(request.form['username'])] == request.form['password']):
                 session['logged_in'] = True
-                flash('You were logged in')
+                # flash('You were logged in')
                 return redirect(url_for('home'))
             else:  error = 'Invalid Credentials. Please try again.'
         except Exception:
@@ -98,8 +94,8 @@ def login():
 @login_required
 def logout():
     session.pop('logged_in', None)
-    flash('You were logged out.')
-    return redirect(url_for('welcome'))
+    # flash('You were logged out.')
+    return redirect(url_for('login'))
 
 # start the server with the 'run()' method
 if __name__ == '__main__':
