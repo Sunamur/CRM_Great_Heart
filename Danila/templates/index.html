@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-
+{% block bonus_title %} Index {% endblock %}
 {% block content %}
 
     <div class="container">
-      <h1>Welcome to Flask!</h1>
+      <h1>Welcome to index page!</h1>
       <br>
       <p>Click <a href="/logout">here</a> to logout.</p>
       {% for message in get_flashed_messages() %}

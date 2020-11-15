@@ -7,17 +7,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!-- These 3 meta tags MUST come first -->
 
-        <title>Great Heart CRM (PnL)</title>
+        <title>Great Heart CRM (PnL) | {% block bonus_title %}{% endblock %} </title>
         <!-- Bootstrap CSS and JS -->
         <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" rel="stylesheet", media="screen">
-        <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-        <!--[if lt IE 9]>
-            <script src="{{ url_for('static', filename='bootstrap/js/html5shiv.min.js') }}"></script>
-            <script src="{{ url_for('static', filename='bootstrap/js/respond.min.js') }}"></script>
-        <![endif]-->
 
-        <!-- Application specific CSS-->
         <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
     </head>
     <body>
@@ -26,6 +19,8 @@
         <div id="header-div" class="clearfix with-margins">
             <div class="pull-left"><a href="/"><h1 class="no-margins">Great Heart CRM (PnL)</h1></a></div>
             <div class="pull-right">
+                
+
             </div>
         </div>
         <hr class="no-margins"/>
@@ -33,7 +28,6 @@
         <div id="main-div" class="with-margins">
         {% block pre_content %}{% endblock %}
         {% block content %}{% endblock %}
-
         {% block post_content %}{% endblock %}
         </div>
 
