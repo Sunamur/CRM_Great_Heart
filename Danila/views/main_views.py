@@ -1,7 +1,7 @@
 from auth import login_required, get_login_info
 from flask import redirect, render_template, Blueprint, request, session, url_for, flash
 from app import db
-
+import pandas as pd
 
 main_blueprint = Blueprint('main', __name__, template_folder='templates')
 
@@ -106,3 +106,16 @@ def client_query():
                 client_id = -1
             con.execute(q)
     return render_template('client_query.html')  # render a template
+
+@main_blueprint.route('/all_client_queries/', methods=['GET', 'POST'])
+def all_client_queries():
+    with db.connect() as con:
+        queries = con.execute('select * from clients_queries')
+    keys = queries.keys()
+    vals = []
+
+    for row in queries:
+        vals.append(row.values())
+    df = pd.DataFrame(vals, columns = keys)
+    df.to_html('/Users/danilaukader/CRM_Great_Heart/Danila/templates/all_client_queries.html')
+    return render_template('all_client_queries.html')
