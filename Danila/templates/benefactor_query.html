@@ -1,0 +1,50 @@
+<html>
+  <head>
+    <title>Flask Intro - login page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="static/bootstrap.min.css" rel="stylesheet" media="screen">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Benefactor query registration form</h1>
+      <br>
+      <form action="" method="post">
+          <input type="text" placeholder="Name" name="name" required value="{{
+          request.form.name }}"> <br>
+          <input type="text" placeholder="Surname" name="name" required value="{{
+          request.form.name }}"> <br>
+          <input type="text" placeholder="Birth date" name="birth_date"  value="{{
+          request.form.birth_date }}"> <br>
+          <input type="text" placeholder="Phone" name="phone"  value="{{
+          request.form.phone }}"> <br>
+          <input type="text" placeholder="Email" name="email" required value="{{
+          request.form.email }}"> <br>
+          <input type="text" placeholder="TG id" name="tg_id"  value="{{
+          request.form.tg_id }}"> <br>
+          <input type="text" placeholder="Socials" name="social_network"  value="{{
+          request.form.social_network }}"> <br>
+          <input type="text" placeholder="Website" name="website"  value="{{
+          request.form.website }}"> <br>
+          <input type="text" placeholder="Query text" name="query_text" required value="{{
+          request.form.website }}"> <br>
+          <input type="text" placeholder="Source" name="source"  value="{{
+          request.form.source }}"> <br>
+          <input type="text" placeholder="Screenshot" name="screenshot"  value="{{
+          request.form.screenshot }}"> <br>
+          <input placeholder="Status" list="query_status" name="query_status" required
+          value = "{{request.form.query_status}}"><br>
+          <datalist id="query_status">
+            <option value="New">
+            <option value="Ready">
+            <option value="In work">
+            <option value="Done">
+            <option value="Closed">
+          </datalist>
+        <input class="btn btn-default" type="submit" value="Submit benefactor's query">
+      </form>
+      {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}</p>
+      {% endif %}
+    </div>
+  </body>
+</html>
