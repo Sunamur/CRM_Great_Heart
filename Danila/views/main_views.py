@@ -1,7 +1,7 @@
 from auth import login_required, get_login_info
 from flask import redirect, render_template, Blueprint, request, session, url_for, flash
 from app import db
-
+import pandas as pd
 
 main_blueprint = Blueprint('main', __name__, template_folder='templates')
 
@@ -26,10 +26,12 @@ def client_registration():
             if (value != '') :
                 client_dict[key] = value
 
-
         cols = list(client_dict.keys())
         cols = ", ".join(list(cols))
         vals = list(client_dict.values())
+        for i in range(len(vals)):
+            if isinstance(vals[i], str):
+                vals[i] = "'" + vals[i] + "'"
         vals = ", ".join(list(vals))
         q = f'''
         Insert into clients ({cols})
@@ -114,9 +116,11 @@ def client_query():
         cols = list(clients_query_dict.keys())
         cols = ", ".join(list(cols))
         vals = list(clients_query_dict.values())
+        for i in range(len(vals)):
+            if isinstance(vals[i], str):
+                vals[i] = "'" + vals[i] + "'"
         vals = ", ".join(list(vals))
-
-        id = f"""select id from clients where phone_main = cast({request.form['phone']} as varchar)"""
+        id = f"""select id from clients where phone_main = cast('{request.form['phone']}' as varchar)"""
         client_id = -1
         q = f'''
                 Insert into clients_queries (query_date, query_timestamp, query_status_updated_at, query_executer, query_coordinator, client_id, {cols})
@@ -127,10 +131,10 @@ def client_query():
         , 1
         , 1
         , {client_id}
-        ,{vals}
+        , {vals}
         )
                 '''
-        with engine.connect() as con:
+        with db.connect() as con:
             q_r = con.execute(id)
             client_id = q_r.first().values()
             if client_id != None:
@@ -139,3 +143,16 @@ def client_query():
                 client_id = -1
             con.execute(q)
     return render_template('client_query.html')  # render a template
+
+@main_blueprint.route('/all_client_queries/', methods=['GET', 'POST'])
+def all_client_queries():
+    with db.connect() as con:
+        queries = con.execute('select * from clients_queries')
+    keys = queries.keys()
+    vals = []
+
+    for row in queries:
+        vals.append(row.values())
+    df = pd.DataFrame(vals, columns = keys)
+    df.to_html('/Users/danilaukader/CRM_Great_Heart/Danila/templates/all_client_queries.html')
+    return render_template('all_client_queries.html')
