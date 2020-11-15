@@ -185,3 +185,84 @@ def all_client_queries():
     df = pd.DataFrame(vals, columns = keys)
     df.to_html('/Users/danilaukader/CRM_Great_Heart/Danila/templates/all_client_queries.html')
     return render_template('all_client_queries.html')
+
+
+@main_blueprint.route('/clients/<int:uid>/', methods=['GET'])
+@login_required
+def client_card(uid):
+    client_data = get_people_info(uid, 'clients')
+    client_fields = [
+        ["id","ID"],
+        ["name","Имя"],
+        ["surname","Фамилия"],
+        ["birth","Дата рождения"],
+        ["condition","Состояние"],
+        ["diagnosis","Диагноз"],
+        ["phone_main","Основной телефон"],
+        ["phone_secondary","Дополнительный телефон"],
+        ["tg_id","Telegram"],
+        ["email","Email"],
+        ["position","Статус"],
+        ["hobbies","Хобби"],
+        ["comment","Комментарий"],
+        ["created_at","Создано"],
+        ["updated_at","Обновлено"],]
+
+    if client_data is None:
+        return render_template('no user')
+    if len(client_fields)!=len(client_data):
+        return render_template('schema error')
+    payload = [[fieldname,pretty_name,data] for [fieldname,pretty_name],data in zip(client_fields, client_data)]
+    name = ' '.join([client_data[1], client_data[2]])
+
+    return render_template('base_card.html', values=payload, name=name, kind='Client')
+
+
+def get_people_info(uid, table='clients'):
+
+
+    qry = f'select id from {table} where id={uid}'
+    with db.connect() as con:
+        q_r = con.execute(qry)
+        client_id = q_r.first().values()
+        if client_id == None:
+            return None
+        res = con.execute(f'select * from {table} where id={uid}').first().values()
+        return res
+@main_blueprint.route('/benfactor_registration/', methods=['GET', 'POST'])
+# @login_required
+def benfactor_registration():
+    if request.method == 'POST':
+        vals = request.form.to_dict()
+        clients_query_dict = {}
+        for (key, value) in vals.items():
+            if (value != '') :
+                clients_query_dict[key] = value
+
+        cols = list(clients_query_dict.keys())
+        cols.pop()
+        cols = ", ".join(list(cols))
+        vals = list(clients_query_dict.values())
+        for i in range(len(vals)):
+            if isinstance(vals[i], str):
+                vals[i] = "'" + vals[i] + "'"
+        benefactor_category = vals.pop()
+
+        vals = ", ".join(list(vals))
+        benfactor_q = f'''
+                Insert into benefactor (created_at, updated_at,  {cols})
+        values(
+        now()
+        , now()
+        , {vals}
+        )
+                '''
+        benefactor_category_q = f"""
+        insert into benefactor_category (created_at, updated_at, category)
+        values (now(), now(), {benefactor_category})
+        """
+
+        with db.connect() as con:
+            con.execute(benfactor_q)
+            con.execute(benefactor_category_q)
+    return render_template('benfactor_registration.html')  # render a template
