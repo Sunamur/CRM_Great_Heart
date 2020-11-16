@@ -1,24 +1,18 @@
 {% extends "base.html" %}
-{% block bonus_title %} New client {% endblock %}
 {% block content %}
 <style>
 div.form-group {
-  margin-top: 10px;
+  margin-top: 20px;
   margin-bottom: 10px;
 }
 
 input.form-control {
   width: 50%;
 }
-
-textarea {
-  resize: none
-}
-
 </style>
 
     <div class="container">
-      <h1>Регистрация нового подопечного</h1>
+      <h1>Регистрация нового {{who}}</h1>
       <form action method="post" role="form" class='form-horizontal'>
         
         {% for name, placeholder, placeholder_name, is_strong in values %}
@@ -30,7 +24,7 @@ textarea {
           </div>
         {% endfor %}
 
-        <input class="btn btn-default" type="submit" value="Create client">
+        <input class="btn btn-default" type="submit" value="Создать">
       </form>
       {% if error %}
         <p class="error"><strong>Error:</strong> {{ error }}</p>

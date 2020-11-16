@@ -14,48 +14,7 @@ def home():
 # def welcome():
 #     return render_template('welcome.html')
 
-@main_blueprint.route('/client_registration/', methods=['GET', 'POST'])
-@login_required
-def client_registration():
-    if request.method == 'POST':
-        vals = request.form.to_dict()
-        client_dict = {}
-
-        for (key, value) in vals.items():
-            # Check if key is even then add pair to new dictionary
-            if (value != '') :
-                client_dict[key] = value
-
-        cols = list(client_dict.keys())
-        cols = ", ".join(list(cols))
-        vals = list(client_dict.values())
-        for i in range(len(vals)):
-            if isinstance(vals[i], str):
-                vals[i] = "'" + vals[i] + "'"
-        vals = ", ".join(list(vals))
-        q = f'''
-        Insert into clients ({cols})
-        values ({vals})
-        '''
-        with db.connect() as con:
-            con.execute(q)
-
-    fields = [('name', "Иван", 'Имя', True), 
-              ('surname', "Иванов", 'Фамилия', True), 
-              ('birth', "01-01-2020", 'Дата рождения', True),
-              ('diagnosis', "Поступил на ФТиАД", 'Диагноз', True),
-              ('condition', "Учится на ФТиАД", 'Состояние', True),
-              ('phone_main', "+7-800-555-35-35", 'Основной телефон для связи', True),
-              ('phone_secondary', "+7-999-999-99-99", 'Дополнительный телефон для связи', False),
-              ('tg_id', "@pupa_and_lupa", 'Контакт в Телеграм', False),
-              ('email', "ivanov_ivan@mail.ru", 'Email', False),
-              ('position', "Подрочист", 'Профессия', False),
-              ('hobbies', "Любит писать CRM за еду", 'Хобби', False),
-              ('comment', "Любит ванильный кофе", 'Комментарий', False)]
-
-    return render_template('client_registration.html', values=fields)  # render a template
-
-@main_blueprint.route('/users', methods=['GET', 'POST'])
+@main_blueprint.route('/users/', methods=['GET', 'POST'])
 @login_required
 def users_table():
     fields = [('name', 'Имя'), 
@@ -79,9 +38,10 @@ def users_table():
                                  work_place, position_fund, education, education_minor, languages,
                                  tg_id, email_personal, position, hobbies, comment from users""")
         table = query.fetchall()
-    return render_template('base_table.html', values=fields, who='членов', margin_left=-200, db_table=table)  # render a template
+    return render_template('base_table.html', values=fields, who='членов', margin_left=-200, 
+                            db_table=table, where_to="/user_registration", whom="члена")
 
-@main_blueprint.route('/sponsors', methods=['GET', 'POST'])
+@main_blueprint.route('/sponsors/', methods=['GET', 'POST'])
 @login_required
 def sponsors_table():
     fields = [('name', 'Имя/название'), 
@@ -95,9 +55,10 @@ def sponsors_table():
     with db.connect() as con:
         query = con.execute("""select name, phone, email, payment_details, socials, website, category, comment from sponsors""")
         table = query.fetchall()
-    return render_template('base_table.html', values=fields, who='спонсоров', margin_left=0, db_table=table)  # render a template
+    return render_template('base_table.html', values=fields, who='спонсоров', margin_left=0, 
+                            db_table=table, where_to="/sponsor_registration", whom="спонсора")
 
-@main_blueprint.route('/slaves', methods=['GET', 'POST'])
+@main_blueprint.route('/slaves/', methods=['GET', 'POST'])
 @login_required
 def slaves_table():
     fields = [('name', 'Имя'), 
@@ -116,9 +77,10 @@ def slaves_table():
         query = con.execute("""select name, surname, birth, diagnosis, condition, 
                                 phone_main, phone_secondary, tg_id, email, position, hobbies, comment from clients""")
         table = query.fetchall()
-    return render_template('base_table.html', values=fields, who='подопечных', margin_left=0, db_table=table)  # render a template
+    return render_template('base_table.html', values=fields, who='подопечных', margin_left=0,
+                            db_table=table, where_to="/client_registration", whom="подопечного")  # render a template
 
-@main_blueprint.route('/partners', methods=['GET', 'POST'])
+@main_blueprint.route('/partners/', methods=['GET', 'POST'])
 @login_required
 def partners_table():
     fields = [('name', 'Имя/название'), 
@@ -132,8 +94,28 @@ def partners_table():
     with db.connect() as con:
         query = con.execute("""select name, phone, email, payment_details, socials, website, comment from partners""")
         table = query.fetchall()
-    return render_template('base_table.html', values=fields, who='партнёров', margin_left=0, db_table=table)  # render a template
+    return render_template('base_table.html', values=fields, who='партнёров', margin_left=0, 
+                            db_table=table, where_to="/partner_registration", whom="партнёра")  # render a template
 
+@main_blueprint.route('/benefactors/', methods=['GET', 'POST'])
+@login_required
+def benefactors_table():
+    fields = [('name', 'Имя'), 
+              ('surname', 'Фамилия'),
+              ('birth_date', 'Дата рождения'),
+              ('phone', 'Контактный телефон'),
+              ('tg_id', 'Контакт в Телеграм'),
+              ('email', 'Email'),
+              ('socials', 'Социальные сети'),
+              ('website', 'Сайт'),
+              ('financial_details', 'Финансовые поступления'),
+              ('comment', 'Комментарий'),]
+
+    with db.connect() as con:
+        query = con.execute("""select name, surname, birth_date, phone, tg_id, email, socials, website, financial_details, comment from benefactor""")
+        table = query.fetchall()
+    return render_template('base_table.html', values=fields, who='благотворителей', margin_left=0, 
+                            db_table=table, where_to="/benefactor_registration", whom="благотворителя")  # render a template
 
 
 @main_blueprint.route('/login/', methods=['GET', 'POST'])
@@ -203,6 +185,38 @@ def client_query():
             con.execute(q)
     return render_template('client_query.html')  # render a template
 
+@main_blueprint.route('/benefactor_query/', methods=['GET', 'POST'])
+# @login_required
+def benefactor_query():
+    if request.method == 'POST':
+        vals = request.form.to_dict()
+        clients_query_dict = {}
+        for (key, value) in vals.items():
+            if (value != '') :
+                clients_query_dict[key] = value
+        cols = list(clients_query_dict.keys())
+        cols = ", ".join(list(cols))
+        vals = list(clients_query_dict.values())
+        for i in range(len(vals)):
+            if isinstance(vals[i], str):
+                vals[i] = "'" + vals[i] + "'"
+        vals = ", ".join(list(vals))
+        # print(vals)
+        benfactor_query_q = f'''
+                Insert into benefactor_queries (query_timestamp, query_date, query_status_updated_at, query_coordinator, query_executor, {cols})
+        values(
+        now()
+        , date(now())
+        , now()
+        , -1
+        , -1
+        , {vals}
+        )
+                '''
+        with db.connect() as con:
+            con.execute(benfactor_query_q)
+    return render_template('benefactor_query.html')  # render a template
+
 @main_blueprint.route('/all_client_queries/', methods=['GET', 'POST'])
 def all_client_queries():
     with db.connect() as con:
@@ -259,9 +273,96 @@ def get_people_info(uid, table='clients'):
             return None
         res = con.execute(f'select * from {table} where id={uid}').first().values()
         return res
-@main_blueprint.route('/benfactor_registration/', methods=['GET', 'POST'])
-# @login_required
-def benfactor_registration():
+
+@main_blueprint.route('/client_registration/', methods=['GET', 'POST'])
+@login_required
+def client_registration():
+    if request.method == 'POST':
+        vals = request.form.to_dict()
+        client_dict = {}
+
+        for (key, value) in vals.items():
+            # Check if key is even then add pair to new dictionary
+            if (value != '') :
+                client_dict[key] = value
+
+        cols = list(client_dict.keys())
+        cols = ", ".join(list(cols))
+        vals = list(client_dict.values())
+        for i in range(len(vals)):
+            if isinstance(vals[i], str):
+                vals[i] = "'" + vals[i] + "'"
+        vals = ", ".join(list(vals))
+        q = f'''
+        Insert into clients ({cols})
+        values ({vals})
+        '''
+        with db.connect() as con:
+            con.execute(q)
+
+    fields = [('name', "Иван", 'Имя', True), 
+              ('surname', "Иванов", 'Фамилия', True), 
+              ('birth', "01-01-2020", 'Дата рождения', True),
+              ('diagnosis', "Поступил на ФТиАД", 'Диагноз', True),
+              ('condition', "Учится на ФТиАД", 'Состояние', True),
+              ('phone_main', "+7-800-555-35-35", 'Основной телефон для связи', True),
+              ('phone_secondary', "+7-999-999-99-99", 'Дополнительный телефон для связи', False),
+              ('tg_id', "@pupa_and_lupa", 'Контакт в Телеграм', False),
+              ('email', "ivanov_ivan@mail.ru", 'Email', False),
+              ('position', "Тракторист", 'Профессия', False),
+              ('hobbies', "Любит писать CRM за еду", 'Хобби', False),
+              ('comment', "Любит ванильный кофе", 'Комментарий', False)]
+
+    return render_template('base_registration.html', values=fields, who='подопечного')  # render a template
+
+@main_blueprint.route('/user_registration/', methods=['GET', 'POST'])
+@login_required
+def user_registration():
+    if request.method == 'POST':
+        vals = request.form.to_dict()
+        client_dict = {}
+
+        for (key, value) in vals.items():
+            # Check if key is even then add pair to new dictionary
+            if (value != '') :
+                client_dict[key] = value
+
+        cols = list(client_dict.keys())
+        cols = ", ".join(list(cols))
+        vals = list(client_dict.values())
+        for i in range(len(vals)):
+            if isinstance(vals[i], str):
+                vals[i] = "'" + vals[i] + "'"
+        vals = ", ".join(list(vals))
+        q = f'''
+        Insert into users ({cols})
+        values ({vals})
+        '''
+        with db.connect() as con:
+            con.execute(q)
+
+    fields = [('name', "Иван", 'Имя', True), 
+              ('surname', "Иванов", 'Фамилия', True), 
+              ('birth', "01-01-2020", 'Дата рождения', True),
+              ('phone_personal', "+7-800-555-35-35", 'Основной телефон для связи', True),
+              ('phone_work', "+7-999-999-99-99", 'Дополнительный телефон для связи', False),
+              ('work_place', "Хлебохладокомбинат", 'Место основной работы', False),
+              ('position_fund', "Волонтёр", 'Позиция в фонде', False),
+              ('education', "Высшее", 'Образование', False),
+              ('education_minor', "Курсы по Dota 2", 'Доп. образование', False),
+              ('languages', "Хорватский, польский", 'Знание языков', False),
+              ('tg_id', "@pupa_and_lupa", 'Контакт в Телеграм', False),
+              ('email_personal', "ivanov_ivan@mail.ru", 'Email', False),
+              ('position', "Тракторист", 'Профессия', False),
+              ('hobbies', "Любит писать CRM за еду", 'Хобби', False),
+              ('comment', "Любит ванильный кофе", 'Комментарий', False)]
+
+    return render_template('base_registration.html', values=fields, who='подопечного')  # render a template
+
+
+@main_blueprint.route('/benefactor_registration/', methods=['GET', 'POST'])
+@login_required
+def benefactor_registration():
     if request.method == 'POST':
         vals = request.form.to_dict()
         clients_query_dict = {}
@@ -295,36 +396,87 @@ def benfactor_registration():
         with db.connect() as con:
             con.execute(benfactor_q)
             con.execute(benefactor_category_q)
-    return render_template('benfactor_registration.html')  # render a template
 
-@main_blueprint.route('/benefactor_query/', methods=['GET', 'POST'])
-# @login_required
-def benefactor_query():
+    fields = [('name', "Иван", 'Имя', True), 
+            ('surname', "Иванов", 'Фамилия', True), 
+            ('birth_date', "01-01-2020", 'Дата рождения', False),
+            ('phone','+7-800-555-35-35', 'Контактный телефон', False),
+            ('tg_id', '@pupa_and_lupa','Контакт в Телеграм', False),
+            ('email', 'ivan_ivanov@mail.ru', 'Email', True),
+            ('socials', 'Instagram: @pupa; VK: vk.com/ivan_ivanov', 'Социальные сети', False),
+            ('website', 'pupa&lupa.com', 'Сайт', False),
+            ('comment', 'Любит запах напалма по утрам', 'Комментарий', False),]
+
+    return render_template('base_registration.html', values=fields, who='благотворителя')
+
+@main_blueprint.route('/sponsor_registration/', methods=['GET', 'POST'])
+@login_required
+def sponsor_registration():
     if request.method == 'POST':
         vals = request.form.to_dict()
-        clients_query_dict = {}
+        client_dict = {}
+
         for (key, value) in vals.items():
+            # Check if key is even then add pair to new dictionary
             if (value != '') :
-                clients_query_dict[key] = value
-        cols = list(clients_query_dict.keys())
+                client_dict[key] = value
+
+        cols = list(client_dict.keys())
         cols = ", ".join(list(cols))
-        vals = list(clients_query_dict.values())
+        vals = list(client_dict.values())
         for i in range(len(vals)):
             if isinstance(vals[i], str):
                 vals[i] = "'" + vals[i] + "'"
         vals = ", ".join(list(vals))
-        # print(vals)
-        benfactor_query_q = f'''
-                Insert into benefactor_queries (query_timestamp, query_date, query_status_updated_at, query_coordinator, query_executor, {cols})
-        values(
-        now()
-        , date(now())
-        , now()
-        , -1
-        , -1
-        , {vals}
-        )
-                '''
+        q = f'''
+        Insert into sponsors ({cols})
+        values ({vals})
+        '''
         with db.connect() as con:
-            con.execute(benfactor_query_q)
-    return render_template('benefactor_query.html')  # render a template
+            con.execute(q)
+
+    fields = [('name', "Иван/Иванов и КО", 'Имя/название', True), 
+              ('phone', "+7-800-555-35-35", 'Телефон для связи', True),
+              ('email', "ivanov_ivan@mail.ru", 'Email', False),
+              ('socials', "Instagram: @pupa; VK: vk.com/ivan_ivanov", 'Социальные сети', False),
+              ('website', "pupa&lupa.com", 'Сайт', False),
+              ('category', "ВИП", 'Категория', False),
+              ('comment', "Любит ванильный кофе", 'Комментарий', False)]
+
+    return render_template('base_registration.html', values=fields, who='спонсора')
+
+@main_blueprint.route('/partner_registration/', methods=['GET', 'POST'])
+@login_required
+def partner_registration():
+    if request.method == 'POST':
+        vals = request.form.to_dict()
+        client_dict = {}
+
+        for (key, value) in vals.items():
+            # Check if key is even then add pair to new dictionary
+            if (value != '') :
+                client_dict[key] = value
+
+        cols = list(client_dict.keys())
+        cols = ", ".join(list(cols))
+        vals = list(client_dict.values())
+        for i in range(len(vals)):
+            if isinstance(vals[i], str):
+                vals[i] = "'" + vals[i] + "'"
+        vals = ", ".join(list(vals))
+        q = f'''
+        Insert into partners ({cols})
+        values ({vals})
+        '''
+        with db.connect() as con:
+            con.execute(q)
+
+    fields = [('name', "Иван/Иванов и КО", 'Имя/название', True), 
+              ('phone', "+7-800-555-35-35", 'Телефон для связи', True),
+              ('email', "ivanov_ivan@mail.ru", 'Email', False),
+              ('socials', "Instagram: @pupa; VK: vk.com/ivan_ivanov", 'Социальные сети', False),
+              ('website', "pupa&lupa.com", 'Сайт', False),
+              ('category', "ВИП", 'Категория', False),
+              ('comment', "Любит ванильный кофе", 'Комментарий', False)]
+
+    return render_template('base_registration.html', values=fields, who='партнёра')
