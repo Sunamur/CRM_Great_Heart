@@ -503,4 +503,27 @@ def partner_registration():
 
         vals = ", ".join(list(vals))
         print(vals, cols)
+    return render_template('partner_contact_info.html')
+
+@main_blueprint.route('/partner_contact_info/', methods=['GET', 'POST'])
+@login_required
+def partner_contact_info():
+    if request.method == 'POST':
+        vals = request.form.to_dict()
+        clients_query_dict = {}
+        for (key, value) in vals.items():
+            if (value != '') :
+                clients_query_dict[key] = value
+
+        cols = list(clients_query_dict.keys())
+        # cols.pop()
+        cols = ", ".join(list(cols))
+        vals = list(clients_query_dict.values())
+        for i in range(len(vals)):
+            if isinstance(vals[i], str):
+                vals[i] = "'" + vals[i] + "'"
+        # benefactor_category = vals.pop()
+
+        vals = ", ".join(list(vals))
+        print(vals, cols)
     return render_template('partner_registration.html')

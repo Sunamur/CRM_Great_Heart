@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <title>Flask Intro - login page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="static/bootstrap.min.css" rel="stylesheet" media="screen">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Benefactor registration form</h1>
+      <br>
+      <form action="" method="post">
+          <input type="text" placeholder="Partner id" name="partner_id" required value="{{
+          request.form.partner_id }}"> <br>
+          <input type="text" placeholder="Name" name="name" required value="{{
+          request.form.name }}"> <br>
+          <input type="text" placeholder="Surname" name="surname" required value="{{
+          request.form.surname }}"> <br>
+          <input type="text" placeholder="Birth date" name="birth_date" required value="{{
+          request.form.birth_date }}"> <br>
+          <input type="text" placeholder="Phone" name="phone" required value="{{
+          request.form.phone }}"> <br>
+          <input type="text" placeholder="TG id" name="tg_id" required value="{{
+          request.form.tg_id }}"> <br>
+          <input type="text" placeholder="Email" name="email" required value="{{
+          request.form.email }}"> <br>
+          <input type="text" placeholder="Division" name="division" required value="{{
+          request.form.division }}"> <br>
+          <input type="text" placeholder="Position" name="position" required value="{{
+          request.form.position }}"> <br>
+          <input type="text" placeholder="Comment" name="comment"  value="{{
+          request.form.comment }}"> <br>
+        <input class="btn btn-default" type="submit" value="Add contact info">
+      </form>
+      {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}</p>
+      {% endif %}
+    </div>
+  </body>
+</html>
