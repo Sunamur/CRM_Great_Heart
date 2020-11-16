@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% block bonus_title %} Таблица {{who}} Фонда {% endblock %}
 {% block content %}
 
 <style>
@@ -13,7 +13,7 @@
 
     <ul class="nav nav-tabs action-nav">
         <li>
-            <a href={{where_to}} title="Create new record">Добавить нового {{whom}}</a>        
+            <a href={{where_to}} title="Create new record">Добавить {{whom}}</a>        
         </li>    
     </ul>
 

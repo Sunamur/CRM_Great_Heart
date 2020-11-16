@@ -60,9 +60,11 @@ def all_client_queries():
 
     for row in queries:
         vals.append(row.values())
-    df = pd.DataFrame(vals, columns = keys)
-    df.to_html('/Users/danilaukader/CRM_Great_Heart/Danila/templates/all_client_queries.html')
-    return render_template('all_client_queries.html')
+
+    return render_template('base_table.html', values=list(zip(keys, keys)), who='обращений клиентов', margin_left=-200, 
+                            db_table=vals, where_to="/client_query", whom="обращение", where='/users/')
+
+
 
 @client_blueprint.route('/client_registration/', methods=['GET', 'POST'])
 @login_required

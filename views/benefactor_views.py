@@ -47,7 +47,7 @@ def benefactor_query():
                 vals[i] = "'" + vals[i] + "'"
         vals = ", ".join(list(vals))
         # print(vals)
-        benfactor_query_q = f'''
+        benefactor_query_q = f'''
                 Insert into benefactor_queries (query_timestamp, query_date, query_status_updated_at, query_coordinator, query_executor, {cols})
         values(
         now()
@@ -59,7 +59,7 @@ def benefactor_query():
         )
                 '''
         with db.connect() as con:
-            con.execute(benfactor_query_q)
+            con.execute(benefactor_query_q)
     return render_template('benefactor_query.html')  # render a template
 
 
@@ -84,7 +84,7 @@ def benefactor_registration():
         benefactor_category = vals.pop()
 
         vals = ", ".join(list(vals))
-        benfactor_q = f'''
+        benefactor_q = f'''
                 Insert into benefactor (created_at, updated_at,  {cols})
         values(
         now()
@@ -98,7 +98,7 @@ def benefactor_registration():
         """
 
         with db.connect() as con:
-            con.execute(benfactor_q)
+            con.execute(benefactor_q)
             con.execute(benefactor_category_q)
 
     fields = [('name', "Иван", 'Имя', True), 

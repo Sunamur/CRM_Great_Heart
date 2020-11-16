@@ -1,12 +1,8 @@
-<html>
-  <head>
-    <title>Flask Intro - login page</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="static/bootstrap.min.css" rel="stylesheet" media="screen">
-  </head>
-  <body>
+{% extends "base.html" %}
+{% block bonus_title %} Partner contact info {% endblock %}
+{% block content %}
     <div class="container">
-      <h1>Benefactor registration form</h1>
+      <h1>Partner contact info</h1>
       <br>
       <form action="" method="post">
           <input type="text" placeholder="Partner id" name="partner_id" required value="{{
@@ -35,5 +31,4 @@
         <p class="error"><strong>Error:</strong> {{ error }}</p>
       {% endif %}
     </div>
-  </body>
-</html>
+{% endblock %}
