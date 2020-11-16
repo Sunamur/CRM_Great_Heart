@@ -14,6 +14,7 @@ def create_app():
     app.secret_key = 'my precious'
     from views import register_blueprints
     register_blueprints(app)
+
     return app
 
 # start the server with the 'run()' method

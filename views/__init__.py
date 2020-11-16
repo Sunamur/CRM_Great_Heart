@@ -9,3 +9,4 @@ def register_blueprints(app):
     app.register_blueprint(partner_blueprint)
     app.register_blueprint(client_blueprint)
     app.register_blueprint(benefactor_blueprint)
+    app.register_blueprint(sponsor_blueprint)
