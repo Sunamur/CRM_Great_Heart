@@ -503,7 +503,18 @@ def partner_registration():
 
         vals = ", ".join(list(vals))
         print(vals, cols)
-    return render_template('partner_contact_info.html')
+        q = f'''
+                        Insert into partners (updated_at, created_at, {cols})
+                values(
+                now()
+                , now()
+                , {vals}
+                )
+                        '''
+        with db.connect() as con:
+            con.execute(q)
+
+    return render_template('partner_registration.html')
 
 @main_blueprint.route('/partner_contact_info/', methods=['GET', 'POST'])
 @login_required
@@ -526,4 +537,4 @@ def partner_contact_info():
 
         vals = ", ".join(list(vals))
         print(vals, cols)
-    return render_template('partner_registration.html')
+    return render_template('partner_contact_info.html')
