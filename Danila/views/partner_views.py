@@ -57,8 +57,21 @@ def partner_registration():
         with db.connect() as con:
             con.execute(q)
 
-    return render_template('partner_registration.html')
-
+    fields = [('name', "Иван/Иванов и КО", 'Имя/название', True),
+              ('type', "Физическое/Юридическое", 'Тип', True),
+              ('inn', '1234567890', "ИНН", True),
+              ('ogrn', '1234567890', 'ОГРН', True),
+              ('legal_address', 'Сеул, улица Небытия 48', 'Адрес', True),
+              ('payment_details', "ХЗ", 'Реквизиты', False),
+              ('logo', "Вставляй картинку в текстовое поле", 'Лого', False),
+              ('phone', "+7-800-555-35-35", 'Телефон для связи', True),
+              ('email', "ivanov_ivan@mail.ru", 'Email', True),
+              ('socials', "Instagram: @pupa; VK: vk.com/ivan_ivanov", 'Социальные сети', False),
+              ('website', "pupa&lupa.com", 'Сайт', True),
+              ('sphere', "Полиграфия", 'Сфера деятельности', True),
+              ('category', "ВИП", 'Категория', True),
+              ('comment', "Любит ванильный кофе", 'Комментарий', False)]
+    return render_template('base_registration.html', values=fields, who='партнёра')
 
 
 

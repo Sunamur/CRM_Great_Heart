@@ -19,7 +19,11 @@ input.form-control {
           <div class="form-group">
             <label for={{name}} class="col-md-2 control-label">{{placeholder_name}}{% if is_strong %}<strong style="color: red">*</strong>{% endif %}</label>
             <div class="col-md-10">
-              <input class="form-control" id={{name}} name={{name}} required={{is_strong}} type="text" placeholder={{placeholder}} value>
+              {% if is_strong%}
+              <input class="form-control" id={{name}} name={{name}} required type="text" placeholder={{placeholder}} value>
+              {% else %}
+              <input class="form-control" id={{name}} name={{name}} type="text" placeholder={{placeholder}} value>
+              {% endif %}
             </div>
           </div>
         {% endfor %}
