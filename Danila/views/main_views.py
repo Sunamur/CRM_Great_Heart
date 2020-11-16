@@ -445,43 +445,6 @@ def sponsor_registration():
 
     return render_template('base_registration.html', values=fields, who='спонсора')
 
-# @main_blueprint.route('/partner_registration/', methods=['GET', 'POST'])
-# @login_required
-# def partner_registration():
-#     if request.method == 'POST':
-#         vals = request.form.to_dict()
-#         client_dict = {}
-#
-#         for (key, value) in vals.items():
-#             # Check if key is even then add pair to new dictionary
-#             if (value != '') :
-#                 client_dict[key] = value
-#
-#         cols = list(client_dict.keys())
-#         cols = ", ".join(list(cols))
-#         vals = list(client_dict.values())
-#         for i in range(len(vals)):
-#             if isinstance(vals[i], str):
-#                 vals[i] = "'" + vals[i] + "'"
-#         vals = ", ".join(list(vals))
-#         q = f'''
-#         Insert into partners ({cols})
-#         values ({vals})
-#         '''
-#         with db.connect() as con:
-#             con.execute(q)
-#
-#     fields = [('name', "Иван/Иванов и КО", 'Имя/название', True),
-#               ('phone', "+7-800-555-35-35", 'Телефон для связи', True),
-#               ('email', "ivanov_ivan@mail.ru", 'Email', False),
-#               ('socials', "Instagram: @pupa; VK: vk.com/ivan_ivanov", 'Социальные сети', False),
-#               ('website', "pupa&lupa.com", 'Сайт', False),
-#               ('category', "ВИП", 'Категория', False),
-#               ('comment', "Любит ванильный кофе", 'Комментарий', False)]
-#
-#     return render_template('base_registration.html', values=fields, who='партнёра')
-
-
 @main_blueprint.route('/partner_registration/', methods=['GET', 'POST'])
 @login_required
 def partner_registration():
@@ -514,7 +477,21 @@ def partner_registration():
         with db.connect() as con:
             con.execute(q)
 
-    return render_template('partner_registration.html')
+    fields = [('name', "Иван/Иванов и КО", 'Имя/название', True),
+              ('type', "Физическое/Юридическое", 'Тип', True),
+              ('inn', '1234567890', "ИНН", True),
+              ('ogrn', '1234567890', 'ОГРН', True),
+              ('legal_address', 'Сеул, улица Небытия 48', 'Адрес', True),
+              ('payment_details', "ХЗ", 'Реквизиты', False),
+              ('logo', "Вставляй картинку в текстовое поле", 'Лого', False),
+              ('phone', "+7-800-555-35-35", 'Телефон для связи', True),
+              ('email', "ivanov_ivan@mail.ru", 'Email', True),
+              ('socials', "Instagram: @pupa; VK: vk.com/ivan_ivanov", 'Социальные сети', False),
+              ('website', "pupa&lupa.com", 'Сайт', True),
+              ('sphere', "Полиграфия", 'Сфера деятельности', True),
+              ('category', "ВИП", 'Категория', True),
+              ('comment', "Любит ванильный кофе", 'Комментарий', False)]
+    return render_template('base_registration.html', values=fields, who='партнёра')
 
 @main_blueprint.route('/partner_contact_info/', methods=['GET', 'POST'])
 @login_required
