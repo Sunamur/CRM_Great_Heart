@@ -39,7 +39,7 @@ def users_table():
                                  tg_id, email_personal, position, hobbies, comment from users""")
         table = query.fetchall()
     return render_template('base_table.html', values=fields, who='членов', margin_left=-200, 
-                            db_table=table, where_to="/user_registration", whom="члена")
+                            db_table=table, where_to="/user_registration", whom="члена", where='/users/')
 
 @main_blueprint.route('/sponsors/', methods=['GET', 'POST'])
 @login_required
@@ -56,7 +56,7 @@ def sponsors_table():
         query = con.execute("""select name, phone, email, payment_details, socials, website, category, comment from sponsors""")
         table = query.fetchall()
     return render_template('base_table.html', values=fields, who='спонсоров', margin_left=0, 
-                            db_table=table, where_to="/sponsor_registration", whom="спонсора")
+                            db_table=table, where_to="/sponsor_registration", whom="спонсора", where='/sponsors/')
 
 @main_blueprint.route('/slaves/', methods=['GET', 'POST'])
 @login_required
