@@ -527,14 +527,26 @@ def partner_contact_info():
                 clients_query_dict[key] = value
 
         cols = list(clients_query_dict.keys())
-        # cols.pop()
+
         cols = ", ".join(list(cols))
         vals = list(clients_query_dict.values())
         for i in range(len(vals)):
             if isinstance(vals[i], str):
                 vals[i] = "'" + vals[i] + "'"
-        # benefactor_category = vals.pop()
 
         vals = ", ".join(list(vals))
         print(vals, cols)
+
+        q = f'''
+                                Insert into partners_contact_info (updated_at, created_at, start_date, {cols})
+                        values(
+                        now()
+                        , now()
+                        , date(now())
+                        
+                        , {vals}
+                        )
+                                '''
+        with db.connect() as con:
+            con.execute(q)
     return render_template('partner_contact_info.html')
