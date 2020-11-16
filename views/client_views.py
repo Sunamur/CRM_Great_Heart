@@ -1,5 +1,5 @@
 from auth import login_required, get_login_info
-from flask import redirect, render_template, Blueprint, request, session, url_for, flash
+from flask import redirect, render_template, Blueprint, request, session, url_for, flash, abort
 from app import db
 from .main_views import get_people_info
 # import pandas as pd
@@ -55,14 +55,17 @@ def client_query():
 def all_client_queries():
     with db.connect() as con:
         queries = con.execute('select * from clients_queries')
+        id_query = con.execute("""select id from clients_queries""")
+        ids = id_query.fetchall()
     keys = queries.keys()
     vals = []
 
     for row in queries:
         vals.append(row.values())
 
+
     return render_template('base_table.html', values=list(zip(keys, keys)), who='обращений клиентов', margin_left=-200, 
-                            db_table=vals, where_to="/client_query", whom="обращение", where='/users/')
+                            db_table=vals, ids=ids, where_to="/client_query", whom="обращение", zip=zip)
 
 
 
@@ -131,9 +134,10 @@ def client_card(uid):
         ["updated_at","Обновлено"],]
 
     if client_data is None:
-        return render_template('no user')
+        abort(404)
+        # return render_template('no user')
     if len(client_fields)!=len(client_data):
-        return render_template('schema error')
+        abort(500)
     payload = [[fieldname,pretty_name,data] for [fieldname,pretty_name],data in zip(client_fields, client_data)]
     name = ' '.join([client_data[1], client_data[2]])
 
@@ -159,5 +163,8 @@ def clients_table():
         query = con.execute("""select name, surname, birth, diagnosis, condition, 
                                 phone_main, phone_secondary, tg_id, email, position, hobbies, comment from clients""")
         table = query.fetchall()
+        id_query = con.execute("""select id from clients""")
+        ids = [str(x[0]) for x in id_query.fetchall()]
+
     return render_template('base_table.html', values=fields, who='подопечных', margin_left=0,
-                            db_table=table, where_to="/client_registration", whom="подопечного")  # render a template
+                            db_table=table, ids=ids, where_to="/client_registration", whom="подопечного", bp='client', zip=zip)  # render a template

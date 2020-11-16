@@ -26,8 +26,8 @@
             </tr>
         </thead>
         <tbody>
-            {% for row in db_table %}
-            <tr>
+            {% for id, row in zip(ids, db_table) %}
+            <tr class='clickable-row' data-href={{url_for(bp+".client_card", uid=id)}}>
                 {% for field in row %}
                     <td>{{field}}</td>
                 {% endfor %}
@@ -37,4 +37,5 @@
 
     </table>
 </div>
+
 {% endblock %}

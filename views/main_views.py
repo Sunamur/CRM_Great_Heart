@@ -1,5 +1,5 @@
 from auth import login_required, get_login_info
-from flask import redirect, render_template, Blueprint, request, session, url_for, flash
+from flask import redirect, render_template, Blueprint, request, session, url_for, flash, abort
 from app import db
 # import pandas as pd
 
@@ -38,8 +38,11 @@ def users_table():
                                  work_place, position_fund, education, education_minor, languages,
                                  tg_id, email_personal, position, hobbies, comment from users""")
         table = query.fetchall()
+        id_query = con.execute("""select id from users""")
+        ids = [str(x[0]) for x in id_query.fetchall()]
+
     return render_template('base_table.html', values=fields, who='членов', margin_left=-200, 
-                            db_table=table, where_to="/user_registration", whom="члена", where='/users/')
+                            db_table=table, ids=ids, where_to="/user_registration", whom="члена", bp='main', zip=zip)
 
 @main_blueprint.route('/login/', methods=['GET', 'POST'])
 def login():
@@ -67,12 +70,10 @@ def logout():
 
 
 def get_people_info(uid, table='clients'):
-
-
     qry = f'select id from {table} where id={uid}'
     with db.connect() as con:
         q_r = con.execute(qry)
-        client_id = q_r.first().values()
+        client_id = q_r.first()
         if client_id == None:
             return None
         res = con.execute(f'select * from {table} where id={uid}').first().values()
@@ -121,5 +122,46 @@ def user_registration():
               ('hobbies', "Любит писать CRM за еду", 'Хобби', False),
               ('comment', "Любит ванильный кофе", 'Комментарий', False)]
 
-    return render_template('base_registration.html', values=fields, who='подопечного')  # render a template
+    return render_template('base_registration.html', values=fields, who='сотрудника')  # render a template
 
+
+
+
+
+@main_blueprint.route('/users/<int:uid>/', methods=['GET'])
+@login_required
+def client_card(uid):
+    data = get_people_info(uid, 'users')
+    fields = [
+        ('id','ID'),
+        ('login','Логин'),
+        ('name', 'Имя', ),
+        ('surname',  'Фамилия', ),
+        ('birth',  'Дата рождения', ),
+        ('city', 'Город'),
+        ('phone_personal',  'Основной телефон для связи', ),
+        ('email_personal',  'Email', ),
+        ('tg_id', 'Контакт в Телеграм', ),
+        ('phone_work', 'Дополнительный телефон для связи', ),
+        ('work_place',  'Место основной работы', ),
+        ('position','Профессия', ),
+        ('position_fund','Позиция в фонде', ),
+        ('education', 'Образование', ),
+        ('education_minor', 'Доп. образование', ),
+        ('languages',  'Знание языков', ),
+        ('hobbies', 'Хобби', ),
+        ('comment', 'Комментарий', ),
+        ('created_at','Создано'),
+        ('updated_at', 'Обновлено'),
+        ('is_active', 'Активен')
+    ]
+
+    if data is None:
+        abort(404)
+    if len(fields)!=len(data): 
+        print(data)
+        abort(500)
+    payload = [[fieldname,pretty_name,data] for [fieldname,pretty_name],data in zip(fields, data)]
+    name = ' '.join([data[1], data[2]])
+
+    return render_template('base_card.html', values=payload, name=name, kind='User')

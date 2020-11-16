@@ -1,7 +1,7 @@
 from auth import login_required, get_login_info
-from flask import redirect, render_template, Blueprint, request, session, url_for, flash
+from flask import redirect, render_template, Blueprint, request, session, url_for, flash, abort
 from app import db
-# import pandas as pd
+from .main_views import get_people_info
 
 partner_blueprint = Blueprint('partner', __name__, template_folder='templates')
 
@@ -21,8 +21,11 @@ def partners_table():
     with db.connect() as con:
         query = con.execute("""select name, phone, email, payment_details, socials, website, comment from partners""")
         table = query.fetchall()
+        id_query = con.execute("""select id from partners""")
+        ids = [str(x[0]) for x in id_query.fetchall()]
+
     return render_template('base_table.html', values=fields, who='партнёров', margin_left=0, 
-                            db_table=table, where_to="/partner_registration", whom="партнёра")  # render a template
+                            db_table=table, ids=ids, where_to="/partner_registration", whom="партнёра", bp="partner", zip=zip)  # render a template
 
 
 
@@ -109,3 +112,40 @@ def partner_contact_info():
         with db.connect() as con:
             con.execute(q)
     return render_template('partner_contact_info.html')
+
+
+
+
+
+@partner_blueprint.route('/partners/<int:uid>/', methods=['GET'])
+@login_required
+def client_card(uid):
+    data = get_people_info(uid, 'partners')
+    fields = [('id','ID'),
+              ('type',  'Тип', ),
+              ('name','Имя/название', ),
+              ('inn',"ИНН", ),
+              ('ogrn', 'ОГРН', ),
+              ('legal_address',  'Адрес', ),
+              ('payment_details','Реквизиты', ),
+              ('logo',  'Лого', ),
+              ('phone', 'Телефон для связи', ),
+              ('email','Email', ),
+              ('socials', 'Социальные сети', ),
+              ('website',  'Сайт', ),
+              ('sphere',  'Сфера деятельности', ),
+              ('category', 'Категория', ),
+              ('comment',  'Комментарий', ),
+              ('created_at','Создано'),
+              ('updated_at', 'Обновлено'),
+    ]
+
+    if data is None:
+        abort(404)
+        # return render_template('no user')
+    if len(fields)!=len(data): 
+        abort(500)
+    payload = [[fieldname,pretty_name,data] for [fieldname,pretty_name],data in zip(fields, data)]
+    name =data[2]
+
+    return render_template('base_card.html', values=payload, name=name, kind='Partner')

@@ -1,9 +1,9 @@
 from .main_views import main_blueprint
 from .partner_views import partner_blueprint
 from .client_views import client_blueprint
-from .sponsor_views import sponsor_blueprint
 from .benefactor_views import benefactor_blueprint
 from .sponsor_views import sponsor_blueprint
+from .error_views import error_blueprint
 
 def register_blueprints(app):
     app.register_blueprint(main_blueprint)
@@ -11,4 +11,5 @@ def register_blueprints(app):
     app.register_blueprint(client_blueprint)
     app.register_blueprint(benefactor_blueprint)
     app.register_blueprint(sponsor_blueprint)
+    app.register_blueprint(error_blueprint)
     

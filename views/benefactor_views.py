@@ -1,6 +1,7 @@
 from auth import login_required, get_login_info
-from flask import redirect, render_template, Blueprint, request, session, url_for, flash
+from flask import redirect, render_template, Blueprint, request, session, url_for, flash, abort
 from app import db
+from .main_views import get_people_info
 # import pandas as pd
 
 benefactor_blueprint = Blueprint('benefactor', __name__, template_folder='templates')
@@ -24,8 +25,10 @@ def benefactors_table():
     with db.connect() as con:
         query = con.execute("""select name, surname, birth_date, phone, tg_id, email, socials, website, financial_details, comment from benefactor""")
         table = query.fetchall()
+        id_query = con.execute("""select id from benefactor""")
+        ids = [str(x[0]) for x in id_query.fetchall()]
     return render_template('base_table.html', values=fields, who='благотворителей', margin_left=0, 
-                            db_table=table, where_to="/benefactor_registration", whom="благотворителя")  # render a template
+                            db_table=table, ids=ids, where_to="/benefactor_registration", whom="благотворителя", bp='benefactor', zip=zip)  # render a template
 
 
 
@@ -112,3 +115,31 @@ def benefactor_registration():
             ('comment', 'Любит запах напалма по утрам', 'Комментарий', False),]
 
     return render_template('base_registration.html', values=fields, who='благотворителя')
+
+
+
+
+@benefactor_blueprint.route('/benefactors/<int:uid>/', methods=['GET'])
+@login_required
+def client_card(uid):
+    data = get_people_info(uid, 'benefactor')
+    fields = [('name', 'Имя'), 
+              ('surname', 'Фамилия'),
+              ('birth_date', 'Дата рождения'),
+              ('phone', 'Контактный телефон'),
+              ('tg_id', 'Контакт в Телеграм'),
+              ('email', 'Email'),
+              ('socials', 'Социальные сети'),
+              ('website', 'Сайт'),
+              ('financial_details', 'Финансовые поступления'),
+              ('comment', 'Комментарий'),]
+
+    if data is None:
+        abort(404)
+        # return render_template('no user')
+    if len(fields)!=len(data):
+        abort(500)
+    payload = [[fieldname,pretty_name,data] for [fieldname,pretty_name],data in zip(fields, data)]
+    name = ' '.join([data[0], data[1]])
+
+    return render_template('base_card.html', values=payload, name=name, kind='Benefactor')
