@@ -54,13 +54,30 @@ def all_client_queries():
 
 
 
-    
+    fields = [
+        ['query_id', 'ID запроса'],
+        ['query_date', 'Дата запроса'],
+        ['query_timestamp', 'Время запроса'],
+        ['contact_name', 'Имя контакта'],
+        ['client_id', 'ID Клиента'],
+        ['phone', 'Телефон'],
+        ['email', 'Email'],
+        ['query_text', 'Текст запроса'],
+        ['query_screenshot', 'Скриншот'],
+        ['query_status', 'Статус запроса'],
+        ['query_status_updated_at', 'Статус обновлен'],
+        ['query_coordinator', 'Координатор запроса'],
+        ['query_executer', 'Исполнитель запроса'],
+        ['query_result', 'Результат запроса'],
+        ['query_finance_execution', 'Финансовое исполнение запроса'],
+
+        ]
 
     for row in queries:
         vals.append(row.values())
 
 
-    return render_template('base_table.html', values=list(zip(keys, keys)), who='обращений клиентов', margin_left=-200, 
+    return render_template('base_table.html', values=fields, who='обращений клиентов', margin_left=-200, 
                             db_table=vals, ids=ids, where_to="/client_query", whom="обращение", zip=zip)
 
 
