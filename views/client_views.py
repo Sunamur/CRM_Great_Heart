@@ -55,10 +55,14 @@ def client_query():
 def all_client_queries():
     with db.connect() as con:
         queries = con.execute('select * from clients_queries')
-        id_query = con.execute("""select id from clients_queries""")
+        id_query = con.execute("""select query_id from clients_queries""")
         ids = id_query.fetchall()
     keys = queries.keys()
     vals = []
+
+
+
+    
 
     for row in queries:
         vals.append(row.values())
