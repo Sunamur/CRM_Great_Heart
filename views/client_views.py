@@ -72,6 +72,25 @@ def all_client_queries():
 @client_blueprint.route('/client_registration/', methods=['GET', 'POST'])
 @login_required
 def client_registration():
+
+    fields = [('name', "Иван", 'Имя', True), 
+              ('surname', "Иванов", 'Фамилия', True), 
+              ('birth', "01-01-2020", 'Дата рождения', False),
+              ('condition', "Учится на ФТиАД", 'Состояние', True),
+              ('diagnosis', "Поступил на ФТиАД", 'Диагноз', True),
+              ('phone_main', "+7-800-555-35-35", 'Телефон для связи', True),
+              ('phone_secondary', "+7-999-999-99-99", 'Доп. телефон для связи', False),
+              ('tg_id', "@pupa_and_lupa", 'Контакт в Телеграм', False),
+              ('email', "ivanov_ivan@mail.ru", 'Email', False),
+              ('position', "Тракторист", 'Профессия', False),
+              ('hobbies', "Любит писать CRM за еду", 'Хобби', False),
+              ('comment', "Любит ванильный кофе", 'Комментарий', False)]
+
+    return render_template('base_registration.html', values=fields, who='подопечного', registered_to="/client_registered/")  # render a template
+
+@client_blueprint.route('/client_registered/', methods=['GET', 'POST'])
+@login_required
+def client_registered():
     if request.method == 'POST':
         vals = request.form.to_dict()
         client_dict = {}
@@ -95,22 +114,7 @@ def client_registration():
         with db.connect() as con:
             con.execute(q)
 
-    fields = [('name', "Иван", 'Имя', True), 
-              ('surname', "Иванов", 'Фамилия', True), 
-              ('birth', "01-01-2020", 'Дата рождения', True),
-              ('condition', "Учится на ФТиАД", 'Состояние', True),
-              ('diagnosis', "Поступил на ФТиАД", 'Диагноз', True),
-              ('phone_main', "+7-800-555-35-35", 'Основной телефон для связи', True),
-              ('phone_secondary', "+7-999-999-99-99", 'Дополнительный телефон для связи', False),
-              ('tg_id', "@pupa_and_lupa", 'Контакт в Телеграм', False),
-              ('email', "ivanov_ivan@mail.ru", 'Email', False),
-              ('position', "Тракторист", 'Профессия', False),
-              ('hobbies', "Любит писать CRM за еду", 'Хобби', False),
-              ('comment', "Любит ванильный кофе", 'Комментарий', False)]
-
-    return render_template('base_registration.html', values=fields, who='подопечного', back_to="/clients/")  # render a template
-
-
+    return redirect('/clients')
 
 @client_blueprint.route('/clients/<int:uid>/', methods=['GET'])
 @login_required
@@ -141,7 +145,8 @@ def client_card(uid):
     payload = [[fieldname,pretty_name,data] for [fieldname,pretty_name],data in zip(client_fields, client_data)]
     name = ' '.join([client_data[1], client_data[2]])
 
-    return render_template('base_card.html', values=payload, name=name, kind='Client', edit_page="/client/edit/<int:uid>/")
+    return render_template('base_card.html', values=payload, name=name, kind='Client', 
+            edit_page="/clients/edit/" + str(uid) + '/', table_page='/clients/')
 
 @client_blueprint.route('/clients/edit/<int:uid>/', methods=['GET', 'POST'])
 @login_required
@@ -149,38 +154,69 @@ def client_edit(uid):
     client_data = get_people_info(uid, 'clients')
     fields = [('name', client_data[1], 'Имя', True), 
               ('surname', client_data[2], 'Фамилия', True), 
-              ('birth', client_data[3], 'Дата рождения', True),
+              ('birth', client_data[3], 'Дата рождения', False),
               ('condition', client_data[4], 'Состояние', True),
               ('diagnosis', client_data[5], 'Диагноз', True),
-              ('phone_main', client_data[6], 'Основной телефон для связи', True),
-              ('phone_secondary', client_data[7], 'Дополнительный телефон для связи', False),
+              ('phone_main', client_data[6], 'Телефон для связи', True),
+              ('phone_secondary', client_data[7], 'Доп. телефон для связи', False),
               ('tg_id', client_data[8], 'Контакт в Телеграм', False),
               ('email', client_data[9], 'Email', False),
               ('position', client_data[10], 'Профессия', False),
               ('hobbies', client_data[11], 'Хобби', False),
               ('comment', client_data[12], 'Комментарий', False)]
 
-    return render_template('base_edit.html', values=fields, who='подопечного', back_to="/clients/<int:uid>/")
+    if client_data is None:
+        abort(404)
 
+    return render_template('base_edit.html', values=fields, who='подопечного', 
+            edit_to="/clients/edited/" + str(uid) + '/')
+
+@client_blueprint.route('/clients/edited/<int:uid>/', methods=['POST'])
+@login_required
+def client_edited(uid):
+
+    if request.method == 'POST':
+        vals = request.form.to_dict()
+        client_dict = {}
+
+        for (key, value) in vals.items():
+            # Check if key is even then add pair to new dictionary
+            if (value != '') :
+                client_dict[key] = value
+
+        cols = list(client_dict.keys())
+        # cols = ", ".join(list(cols))
+        vals = list(client_dict.values())
+        for i in range(len(vals)):
+            if isinstance(vals[i], str):
+                vals[i] = "'" + vals[i] + "'"
+        # vals = ", ".join(list(vals))
+        q = 'update clients set '
+        for i,j in zip(cols, vals):
+            print(type(j))
+            print(j == '\'None\'')
+            if j != '\'None\'':
+                q += f'{i} = {j},'
+
+        q = q[:-1]
+        q += f' where id = {uid}'
+        with db.connect() as con:
+            con.execute(q)
+    
+
+    return redirect('/clients/')
 
 @client_blueprint.route('/clients/', methods=['GET', 'POST'])
 @login_required
 def clients_table():
     fields = [('name', 'Имя'), 
               ('surname', 'Фамилия'), 
-              ('birth', 'Дата рождения'),
               ('condition', 'Состояние'),
               ('diagnosis', 'Диагноз'),
-              ('phone_main', 'Основной телефон для связи'),
-              ('phone_secondary', 'Дополнительный телефон для связи'),
-              ('tg_id', 'Контакт в Телеграм'),
-              ('email', 'Email'),
-              ('position', 'Профессия'),
-              ('hobbies', 'Хобби'),
-              ('comment', 'Комментарий')]
+              ('phone_main', 'Основной телефон для связи'),]
     with db.connect() as con:
-        query = con.execute("""select name, surname, birth, diagnosis, condition, 
-                                phone_main, phone_secondary, tg_id, email, position, hobbies, comment from clients""")
+        query = con.execute("""select name, surname, diagnosis, condition, 
+                                phone_main from clients""")
         table = query.fetchall()
         id_query = con.execute("""select id from clients""")
         ids = [str(x[0]) for x in id_query.fetchall()]

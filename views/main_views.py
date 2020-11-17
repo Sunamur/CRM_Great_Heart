@@ -35,7 +35,7 @@ def users_table():
 
     return render_template('base_table.html', values=fields, who='сотрудников', margin_left=-10, 
                             db_table=table, ids=ids, where_to="/user_registration/", whom="сотрудника",
-                            zip=zip, card_to='/users/')
+                            zip=zip)
 
 @main_blueprint.route('/login/', methods=['GET', 'POST'])
 def login():
@@ -94,11 +94,11 @@ def user_registration():
               ('hobbies', "Любит писать CRM за еду", 'Хобби', False),
               ('comment', "Любит ванильный кофе", 'Комментарий', False)]
 
-    return render_template('base_registration.html', values=fields, who='сотрудника', registrated_to='/user_registrated/')
+    return render_template('base_registration.html', values=fields, who='сотрудника', registered_to='/user_registered/')
 
-@main_blueprint.route('/user_registrated/', methods=['POST'])
+@main_blueprint.route('/user_registered/', methods=['POST'])
 @login_required
-def user_registrated():
+def user_registered():
     if request.method == 'POST':
         vals = request.form.to_dict()
         user_dict = {}
@@ -132,22 +132,22 @@ def user_card(uid):
     fields = [
         ('id','ID'),
         ('login','Логин'),
-        ('name', 'Имя', ),
-        ('surname',  'Фамилия', ),
-        ('birth_date',  'Дата рождения', ),
+        ('name', 'Имя'),
+        ('surname', 'Фамилия'),
+        ('birth_date', 'Дата рождения'),
         ('city', 'Город'),
-        ('phone_personal',  'Основной телефон для связи', ),
-        ('email_personal',  'Email', ),
-        ('tg_id', 'Контакт в Телеграм', ),
-        ('phone_work', 'Дополнительный телефон для связи', ),
-        ('work_place',  'Место основной работы', ),
-        ('position','Профессия', ),
-        ('position_fund','Позиция в фонде', ),
-        ('education', 'Образование', ),
-        ('education_minor', 'Доп. образование', ),
-        ('languages',  'Знание языков', ),
-        ('hobbies', 'Хобби', ),
-        ('comment', 'Комментарий', ),
+        ('phone_personal', 'Основной телефон для связи'),
+        ('email_personal', 'Email'),
+        ('tg_id', 'Контакт в Телеграм'),
+        ('phone_work', 'Дополнительный телефон для связи'),
+        ('work_place', 'Место основной работы'),
+        ('position','Профессия'),
+        ('position_fund','Позиция в фонде'),
+        ('education', 'Образование'),
+        ('education_minor', 'Доп. образование'),
+        ('languages', 'Знание языков'),
+        ('hobbies', 'Хобби'),
+        ('comment', 'Комментарий'),
         ('created_at','Создано'),
         ('updated_at', 'Обновлено'),
         ('is_active', 'Активен')
@@ -159,7 +159,7 @@ def user_card(uid):
         print(user_data)
         abort(500)
     payload = [[fieldname,pretty_name,data] for [fieldname,pretty_name],data in zip(fields, user_data)]
-    name = ' '.join([user_data[1], user_data[2]])
+    name = ' '.join([user_data[2], user_data[3]])
 
     return render_template('base_card.html', values=payload, name=name, kind='User', 
             edit_page='/users/edit/' + str(uid) + '/', table_page='/users/')
@@ -168,7 +168,8 @@ def user_card(uid):
 @login_required
 def user_edit(uid):
     user_data = get_people_info(uid, 'users')
-    fields = [('name', user_data[2], 'Имя', True), 
+    fields = [('login', user_data[1], 'Логин', True), 
+              ('name', user_data[2], 'Имя', True), 
               ('surname', user_data[3], 'Фамилия', True), 
               ('birth_date', user_data[4], 'Дата рождения', True),
               ('city', user_data[5], 'Город', True),
@@ -176,9 +177,9 @@ def user_edit(uid):
               ('email_personal', user_data[7], 'Email', False),
               ('tg_id', user_data[8], 'Контакт в Телеграм', False),
               ('phone_work', user_data[9], 'Дополнительный телефон для связи', False),
-              ('work_place', user_data[10], 'Место основной работы', False),
-              ('position', user_data[11], 'Профессия', False),
-              ('position_fund', user_data[12], 'Позиция в фонде', False),
+              ('work_place', user_data[10], 'Место основной работы', True),
+              ('position', user_data[11], 'Профессия', True),
+              ('position_fund', user_data[12], 'Позиция в фонде', True),
               ('education', user_data[13], 'Образование', False),
               ('education_minor', user_data[14], 'Доп. образование', False),
               ('languages', user_data[15], 'Знание языков', False),
@@ -189,7 +190,7 @@ def user_edit(uid):
         abort(404)
 
     return render_template('base_edit.html', values=fields, who='сотруднике', 
-                edit_to="/users/edited/" + str(uid) + '/', delete_to='/users/delete/' + str(uid) + '/')
+                edit_to="/users/edited/" + str(uid) + '/')
 
 @main_blueprint.route('/users/edited/<int:uid>/', methods=['POST'])
 @login_required
@@ -222,13 +223,5 @@ def user_edited(uid):
         q += f' where id = {uid}'
         with db.connect() as con:
             con.execute(q)
-
-    return redirect(url_for('main.users_table'))
-
-@main_blueprint.route('/users/delete/<int:uid>/', methods=['GET', 'POST'])
-@login_required
-def user_delete(uid):
-    
-    # Тут SQL запрос на удаление персонажа
 
     return redirect('/users/')
