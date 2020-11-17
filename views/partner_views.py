@@ -25,7 +25,7 @@ def partners_table():
         ids = [str(x[0]) for x in id_query.fetchall()]
 
     return render_template('base_table.html', values=fields, who='партнёров', margin_left=0, 
-                            db_table=table, ids=ids, where_to="/partner_registration", whom="партнёра", bp="partner", zip=zip)  # render a template
+                            db_table=table, ids=ids, where_to="/partner_registration", whom="партнёра", bp="partner", zip=zip,)  # render a template
 
 
 
