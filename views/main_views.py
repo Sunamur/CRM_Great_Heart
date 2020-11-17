@@ -35,7 +35,7 @@ def users_table():
 
     return render_template('base_table.html', values=fields, who='сотрудников', margin_left=-10, 
                             db_table=table, ids=ids, where_to="/user_registration/", whom="сотрудника",
-                            zip=zip, card_to='/users/')
+                            zip=zip)
 
 @main_blueprint.route('/login/', methods=['GET', 'POST'])
 def login():
