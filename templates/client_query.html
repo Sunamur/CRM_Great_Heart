@@ -1,6 +1,17 @@
 {% extends "base.html" %}
 {% block bonus_title %} Client query creation {% endblock %}
 {% block content %}
+
+<style>
+  div.form-group {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+  
+  input.form-control {
+    width: 50%;
+  }
+  </style>
     <div class="container">
       <h1>Client query creation form</h1>
       <br>
@@ -14,8 +25,8 @@
           request.form.email }}"> <br>
           <input type="text" placeholder="Query text" name="query_text" required value="{{
           request.form.query_text }}"> <br>
-          <input type="text" placeholder="Screenshot" name="screenshot"  value="{{
-          request.form.screenshot }}"> <br>
+          <input type="text" placeholder="Screenshot" name="query_screenshot"  value="{{
+          request.form.query_screenshot }}"> <br>
           <input placeholder="Status" list="Status" name="query_status" required
           value = "{{request.form.query_status}}"><br>
           <datalist id="Status">

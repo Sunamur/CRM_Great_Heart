@@ -1,10 +1,21 @@
 {% extends "base.html" %}
 {% block bonus_title %} Benefactor query registration {% endblock %}
 {% block content %}
+
+<style>
+  div.form-group {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+  
+  input.form-control {
+    width: 50%;
+  }
+  </style>
     <div class="container">
       <h1>Benefactor query registration form</h1>
       <br>
-      <form action="" method="post">
+      <form action="" method="post"  role="form" class='form-horizontal'>
           <input type="text" placeholder="Name" name="name" required value="{{
           request.form.name }}"> <br>
           <input type="text" placeholder="Surname" name="name" required value="{{
