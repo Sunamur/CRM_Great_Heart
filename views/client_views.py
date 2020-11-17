@@ -193,8 +193,6 @@ def client_edited(uid):
         # vals = ", ".join(list(vals))
         q = 'update clients set '
         for i,j in zip(cols, vals):
-            print(type(j))
-            print(j == '\'None\'')
             if j != '\'None\'':
                 q += f'{i} = {j},'
 
@@ -221,5 +219,6 @@ def clients_table():
         id_query = con.execute("""select id from clients""")
         ids = [str(x[0]) for x in id_query.fetchall()]
 
-    return render_template('base_table.html', values=fields, who='подопечных', margin_left=-00,
-                            db_table=table, ids=ids, where_to="/client_registration", whom="подопечного", bp='client', zip=zip)  # render a template
+    return render_template('base_table.html', values=fields, who='подопечных', 
+            db_table=table, ids=ids, where_to="/client_registration", 
+            whom="подопечного", bp='client', zip=zip) 

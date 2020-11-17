@@ -10,10 +10,6 @@ main_blueprint = Blueprint('main', __name__, template_folder='templates')
 def home():
     return render_template('index.html')
 
-# @main_blueprint.route('/welcome/')
-# def welcome():
-#     return render_template('welcome.html')
-
 @main_blueprint.route('/users/', methods=['GET', 'POST'])
 @login_required
 def users_table():
@@ -33,9 +29,9 @@ def users_table():
         id_query = con.execute("""select id from users""")
         ids = [str(x[0]) for x in id_query.fetchall()]
 
-    return render_template('base_table.html', values=fields, who='сотрудников', margin_left=-10, 
-                            db_table=table, ids=ids, where_to="/user_registration/", whom="сотрудника",
-                            zip=zip)
+    return render_template('base_table.html', values=fields, who='сотрудников', 
+            db_table=table, ids=ids, where_to="/user_registration/", 
+            whom="сотрудника", zip=zip)
 
 @main_blueprint.route('/login/', methods=['GET', 'POST'])
 def login():
@@ -94,7 +90,8 @@ def user_registration():
               ('hobbies', "Любит писать CRM за еду", 'Хобби', False),
               ('comment', "Любит ванильный кофе", 'Комментарий', False)]
 
-    return render_template('base_registration.html', values=fields, who='сотрудника', registered_to='/user_registered/')
+    return render_template('base_registration.html', values=fields, who='сотрудника', 
+            registered_to='/user_registered/')
 
 @main_blueprint.route('/user_registered/', methods=['POST'])
 @login_required
@@ -122,7 +119,7 @@ def user_registered():
         with db.connect() as con:
             con.execute(q)
 
-    return redirect('/users')
+    return redirect('/users/')
 
 
 @main_blueprint.route('/users/<int:uid>/', methods=['GET'])
@@ -156,7 +153,6 @@ def user_card(uid):
     if user_data is None:
         abort(404)
     if len(fields)!=len(user_data): 
-        print(user_data)
         abort(500)
     payload = [[fieldname,pretty_name,data] for [fieldname,pretty_name],data in zip(fields, user_data)]
     name = ' '.join([user_data[2], user_data[3]])
@@ -214,8 +210,6 @@ def user_edited(uid):
         # vals = ", ".join(list(vals))
         q = 'update users set '
         for i,j in zip(cols, vals):
-            print(type(j))
-            print(j == '\'None\'')
             if j != '\'None\'':
                 q += f'{i} = {j},'
 
