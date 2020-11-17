@@ -13,6 +13,7 @@ sponsor_blueprint = Blueprint('sponsor', __name__, template_folder='templates')
 def sponsor_registration():
 
     fields = [('name', "Иван/Иванов и КО", 'Имя/название', True), 
+              ('payment_details', '5469 3800 5500 3322', 'Платёжные реквизиты', False),
               ('phone', "+7-800-555-35-35", 'Телефон для связи', True),
               ('email', "ivanov_ivan@mail.ru", 'Email', True),
               ('socials', "Instagram: @pupa; VK: vk.com/ivan_ivanov", 'Социальные сети', False),
@@ -28,16 +29,16 @@ def sponsor_registration():
 def sponsor_registered():
     if request.method == 'POST':
         vals = request.form.to_dict()
-        client_dict = {}
+        sponsor_dict = {}
 
         for (key, value) in vals.items():
             # Check if key is even then add pair to new dictionary
             if (value != '') :
-                client_dict[key] = value
+                sponsor_dict[key] = value
 
-        cols = list(client_dict.keys())
+        cols = list(sponsor_dict.keys())
         cols = ", ".join(list(cols))
-        vals = list(client_dict.values())
+        vals = list(sponsor_dict.values())
         for i in range(len(vals)):
             if isinstance(vals[i], str):
                 vals[i] = "'" + vals[i] + "'"
@@ -75,12 +76,14 @@ def sponsors_table():
 
 @sponsor_blueprint.route('/sponsors/<int:uid>/', methods=['GET'])
 @login_required
-def client_card(uid):
+def sponsor_card(uid):
     data = get_people_info(uid, 'sponsors')
 
     fields = [
         ('id','ID'),
         ('name',  'Имя/название'), 
+        ('payment_details', 'Платёжные реквизиты'),
+        ('logo', 'Тут должно быть лого'),
         ('phone','Телефон для связи'),
         ('email',  'Email'),
         ('socials',  'Социальные сети'),
@@ -96,8 +99,8 @@ def client_card(uid):
         # return render_template('no user')
     if len(fields)!=len(data): 
         abort(500)
-    payload = [[fieldname,pretty_name,data] for [fieldname,pretty_name],data in zip(fields, data)]
-    name = data[2]
+    payload = [[fieldname, pretty_name,data] for [fieldname,pretty_name],data in zip(fields, data)]
+    name = data[1]
 
     return render_template('base_card.html', values=payload, name=name, kind='Sponsor', 
             edit_page='/sponsors/edit/' + str(uid) + '/', table_page='/sponsors/')
