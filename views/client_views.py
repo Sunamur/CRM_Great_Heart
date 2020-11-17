@@ -28,17 +28,9 @@ def client_query():
         id = f"""select id from clients where phone_main = cast('{request.form['phone']}' as varchar)"""
         client_id = -1
         q = f'''
-                Insert into clients_queries (query_date, query_timestamp, query_status_updated_at, query_executer, query_coordinator, client_id, {cols})
-        values(
-        date(now())
-        , now()
-        , now()
-        , 1
-        , 1
-        , {client_id}
-        , {vals}
-        )
-                '''
+        Insert into clients_queries (query_date, query_timestamp, query_status_updated_at, query_executer, query_coordinator, client_id, {cols})
+        values(date(now()), now(), now(), 1, 1, {client_id}, {vals})
+        '''
         with db.connect() as con:
             q_r = con.execute(id)
             client_id = q_r.first().values()
@@ -112,8 +104,8 @@ def client_registered():
                 vals[i] = "'" + vals[i] + "'"
         vals = ", ".join(list(vals))
         q = f'''
-        Insert into clients ({cols})
-        values ({vals})
+        Insert into clients (updated_at, created_at, {cols})
+        values (now(), now(), {vals})
         '''
         with db.connect() as con:
             con.execute(q)
@@ -200,8 +192,7 @@ def client_edited(uid):
             if j != '\'None\'':
                 q += f'{i} = {j},'
 
-        q = q[:-1]
-        q += f' where id = {uid}'
+        q += f'updated_at = now() where id = {uid}'
         with db.connect() as con:
             con.execute(q)
     

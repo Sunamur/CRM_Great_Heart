@@ -44,8 +44,8 @@ def sponsor_registered():
                 vals[i] = "'" + vals[i] + "'"
         vals = ", ".join(list(vals))
         q = f'''
-        Insert into sponsors ({cols})
-        values ({vals})
+        Insert into sponsors (updated_at, created_at, {cols})
+        values (now(), now(), {vals})
         '''
         with db.connect() as con:
             con.execute(q)
@@ -148,8 +148,7 @@ def sponsor_edited(uid):
             if j != '\'None\'':
                 q += f'{i} = {j},'
 
-        q = q[:-1]
-        q += f' where id = {uid}'
+        q += f'updated_at = now() where id = {uid}'
         with db.connect() as con:
             con.execute(q)
 
