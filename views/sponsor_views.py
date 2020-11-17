@@ -81,6 +81,8 @@ def client_card(uid):
     fields = [
         ('id','ID'),
         ('name',  'Имя/название'), 
+        ('payment_details','Детали платежа'),
+        ('logo','Лого'),
         ('phone','Телефон для связи'),
         ('email',  'Email'),
         ('socials',  'Социальные сети'),
