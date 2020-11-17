@@ -42,7 +42,7 @@ def sponsor_registration():
               ('category', "ВИП", 'Категория', False),
               ('comment', "Любит ванильный кофе", 'Комментарий', False)]
 
-    return render_template('base_registration.html', values=fields, who='спонсора')
+    return render_template('base_registration.html', values=fields, who='спонсора', back_to="/sponsors/")
 
 
 

@@ -74,7 +74,7 @@ def partner_registration():
               ('sphere', "Полиграфия", 'Сфера деятельности', True),
               ('category', "ВИП", 'Категория', True),
               ('comment', "Любит ванильный кофе", 'Комментарий', False)]
-    return render_template('base_registration.html', values=fields, who='партнёра')
+    return render_template('base_registration.html', values=fields, who='партнёра', back_to="/partners/")
 
 
 

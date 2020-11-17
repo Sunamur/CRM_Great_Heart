@@ -22,27 +22,28 @@ def users_table():
               ('birth_date', 'Дата рождения'),
               ('city', 'Город'),
               ('phone_personal', 'Основной телефон для связи'),
+              ('email_personal', 'Email'),
+              ('tg_id', 'Контакт в Телеграм'),
               ('phone_work', 'Дополнительный телефон для связи'),
               ('work_place', 'Место основной работы'),
+              ('position', 'Профессия'),
               ('position_fund', 'Позиция в фонде'),
               ('education', 'Образование'),
               ('education_minor', 'Доп. образование'),
               ('languages', 'Знание языков'),
-              ('tg_id', 'Контакт в Телеграм'),
-              ('email_personal', 'Email'),
-              ('position', 'Профессия'),
               ('hobbies', 'Хобби'),
               ('comment', 'Комментарий')]
     with db.connect() as con:
-        query = con.execute("""select name, surname, birth_date, city, phone_personal, phone_work,
-                                 work_place, position_fund, education, education_minor, languages,
-                                 tg_id, email_personal, position, hobbies, comment from users""")
+        query = con.execute("""select name, surname, birth_date, city, phone_personal, email_personal,
+                                 tg_id, phone_work, work_place, position, position_fund, education, education_minor,
+                                 languages, hobbies, comment from users""")
         table = query.fetchall()
         id_query = con.execute("""select id from users""")
         ids = [str(x[0]) for x in id_query.fetchall()]
 
-    return render_template('base_table.html', values=fields, who='членов', margin_left=-200, 
-                            db_table=table, ids=ids, where_to="/user_registration", whom="члена", bp='main', zip=zip)
+    return render_template('base_table.html', values=fields, who='сотрудников', margin_left=-330, 
+                            db_table=table, ids=ids, where_to="/user_registration", whom="сотрудника", 
+                            bp='main', zip=zip, card_to='/users/')
 
 @main_blueprint.route('/login/', methods=['GET', 'POST'])
 def login():
@@ -108,24 +109,22 @@ def user_registration():
 
     fields = [('name', "Иван", 'Имя', True), 
               ('surname', "Иванов", 'Фамилия', True), 
-              ('birth', "01-01-2020", 'Дата рождения', True),
+              ('birth_date', "01-01-2020", 'Дата рождения', True),
+              ('city', 'Междуречье', 'Город', True),
               ('phone_personal', "+7-800-555-35-35", 'Основной телефон для связи', True),
+              ('email_personal', "ivanov_ivan@mail.ru", 'Email', False),
+              ('tg_id', "@pupa_and_lupa", 'Контакт в Телеграм', False),
               ('phone_work', "+7-999-999-99-99", 'Дополнительный телефон для связи', False),
               ('work_place', "Хлебохладокомбинат", 'Место основной работы', False),
+              ('position', "Тракторист", 'Профессия', False),
               ('position_fund', "Волонтёр", 'Позиция в фонде', False),
               ('education', "Высшее", 'Образование', False),
               ('education_minor', "Курсы по Dota 2", 'Доп. образование', False),
               ('languages', "Хорватский, польский", 'Знание языков', False),
-              ('tg_id', "@pupa_and_lupa", 'Контакт в Телеграм', False),
-              ('email_personal', "ivanov_ivan@mail.ru", 'Email', False),
-              ('position', "Тракторист", 'Профессия', False),
               ('hobbies', "Любит писать CRM за еду", 'Хобби', False),
               ('comment', "Любит ванильный кофе", 'Комментарий', False)]
 
     return render_template('base_registration.html', values=fields, who='сотрудника')  # render a template
-
-
-
 
 
 @main_blueprint.route('/users/<int:uid>/', methods=['GET'])
@@ -137,7 +136,7 @@ def client_card(uid):
         ('login','Логин'),
         ('name', 'Имя', ),
         ('surname',  'Фамилия', ),
-        ('birth',  'Дата рождения', ),
+        ('birth_date',  'Дата рождения', ),
         ('city', 'Город'),
         ('phone_personal',  'Основной телефон для связи', ),
         ('email_personal',  'Email', ),
@@ -164,4 +163,27 @@ def client_card(uid):
     payload = [[fieldname,pretty_name,data] for [fieldname,pretty_name],data in zip(fields, data)]
     name = ' '.join([data[1], data[2]])
 
-    return render_template('base_card.html', values=payload, name=name, kind='User')
+    return render_template('base_card.html', values=payload, name=name, kind='User', edit_page='/users/edit/' + str(uid))
+
+@main_blueprint.route('/users/edit/<int:uid>/', methods=['GET', 'POST'])
+@login_required
+def user_edit(uid):
+    user_data = get_people_info(uid, 'users')
+    fields = [('name', user_data[2], 'Имя', True), 
+              ('surname', user_data[3], 'Фамилия', True), 
+              ('birth_date', user_data[4], 'Дата рождения', True),
+              ('city', user_data[5], 'Город', True),
+              ('phone_personal', user_data[6], 'Основной телефон для связи', True),
+              ('email_personal', user_data[7], 'Email', False),
+              ('tg_id', user_data[8], 'Контакт в Телеграм', False),
+              ('phone_work', user_data[9], 'Дополнительный телефон для связи', False),
+              ('work_place', user_data[10], 'Место основной работы', False),
+              ('position', user_data[11], 'Профессия', False),
+              ('position_fund', user_data[12], 'Позиция в фонде', False),
+              ('education', user_data[13], 'Образование', False),
+              ('education_minor', user_data[14], 'Доп. образование', False),
+              ('languages', user_data[15], 'Знание языков', False),
+              ('hobbies', user_data[16], 'Хобби', False),
+              ('comment', user_data[17], 'Комментарий', False)]
+
+    return render_template('base_edit.html', values=fields, who='сотруднике', back_to="/users/<int:uid>/")

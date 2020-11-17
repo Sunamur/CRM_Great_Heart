@@ -15,23 +15,23 @@ input.form-control {
 </style>
 
     <div class="container">
-      <h1>Регистрация нового {{who}}</h1>
+      <h1>Редактирование данных о {{who}}</h1>
       <form action={{back_to}} method="post" role="form" class='form-horizontal'>
         
-        {% for name, placeholder, placeholder_name, is_strong in values %}
+        {% for name, value, placeholder_name, is_strong in values %}
           <div class="form-group">
             <label for={{name}} class="col-md-2 control-label">{{placeholder_name}}{% if is_strong %}<strong style="color: red">*</strong>{% endif %}</label>
             <div class="col-md-10">
               {% if is_strong%}
-              <input class="form-control" id={{name}} name={{name}} required type="text" placeholder={{placeholder}} value>
+              <input class="form-control" id={{name}} name={{name}} required type="text" value={{value}}>
               {% else %}
-              <input class="form-control" id={{name}} name={{name}} type="text" placeholder={{placeholder}} value>
+              <input class="form-control" id={{name}} name={{name}} type="text" value={{value}}>
               {% endif %}
             </div>
           </div>
         {% endfor %}
 
-        <input class="btn btn-default" type="submit" value="Создать">
+        <input class="btn btn-default" type="submit" value="Сохранить">
       </form>
       {% if error %}
         <p class="error"><strong>Error:</strong> {{ error }}</p>

@@ -21,9 +21,11 @@
         <thead>
             <tr>
                 {% for db_field, table_field in values %}
-                    <th class="column-header col-{{db_field}}"><a>{{table_field}}</a></th>
+                    <th class="column-header"><a>{{table_field}}</a></th>
                 {% endfor %}
+                <th class="column-header"><a>Ссылка на страницу {{whom}}</a></th>
             </tr>
+            
         </thead>
         <tbody>
             {% for id, row in zip(ids, db_table) %}
@@ -31,8 +33,10 @@
                 {% for field in row %}
                     <td>{{field}}</td>
                 {% endfor %}
+                <td><a href={{card_to + id}}>Ссылка</a></td>    
             </tr>
             {% endfor %}
+            
         </tbody>
 
     </table>

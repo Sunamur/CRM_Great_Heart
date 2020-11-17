@@ -6,19 +6,28 @@
 {% endblock %}
 {% block content %}
 
-<h3>{{name}}</h3>
-<p></p>
 
-<table class="table w-auto table-stripped table-bordered table-hover">
-<tbody>
-{% for fieldname,pretty_name,data in values%}
-    <tr>
-        <td><b>{{ pretty_name }}</b></td>
-        <td>{{ data }}</td>
-    </tr>
-{% endfor %}
-</tbody>
-</table>
+
+<div class="container">
+    <h3>{{name}}</h3>
+    <p></p>
+
+    <table class="table table-stripped table-bordered table-hover">
+    <tbody>
+    {% for fieldname,pretty_name,data in values%}
+        <tr>
+            <td><b>{{ pretty_name }}</b></td>
+            <td>{{ data }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+
+    <form action={{edit_page}}>
+        <input class="btn btn-default" type="submit" value="Редактировать">
+    </form>
+</div>
+
 
 {% block actions %}{% endblock %}
 

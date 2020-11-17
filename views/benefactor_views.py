@@ -114,7 +114,7 @@ def benefactor_registration():
             ('website', 'pupa&lupa.com', 'Сайт', False),
             ('comment', 'Любит запах напалма по утрам', 'Комментарий', False),]
 
-    return render_template('base_registration.html', values=fields, who='благотворителя')
+    return render_template('base_registration.html', values=fields, who='благотворителя', back_to="/benefactors/")
 
 
 

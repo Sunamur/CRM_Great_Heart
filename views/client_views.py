@@ -98,8 +98,8 @@ def client_registration():
     fields = [('name', "Иван", 'Имя', True), 
               ('surname', "Иванов", 'Фамилия', True), 
               ('birth', "01-01-2020", 'Дата рождения', True),
-              ('diagnosis', "Поступил на ФТиАД", 'Диагноз', True),
               ('condition', "Учится на ФТиАД", 'Состояние', True),
+              ('diagnosis', "Поступил на ФТиАД", 'Диагноз', True),
               ('phone_main', "+7-800-555-35-35", 'Основной телефон для связи', True),
               ('phone_secondary', "+7-999-999-99-99", 'Дополнительный телефон для связи', False),
               ('tg_id', "@pupa_and_lupa", 'Контакт в Телеграм', False),
@@ -108,7 +108,7 @@ def client_registration():
               ('hobbies', "Любит писать CRM за еду", 'Хобби', False),
               ('comment', "Любит ванильный кофе", 'Комментарий', False)]
 
-    return render_template('base_registration.html', values=fields, who='подопечного')  # render a template
+    return render_template('base_registration.html', values=fields, who='подопечного', back_to="/clients/")  # render a template
 
 
 
@@ -141,7 +141,26 @@ def client_card(uid):
     payload = [[fieldname,pretty_name,data] for [fieldname,pretty_name],data in zip(client_fields, client_data)]
     name = ' '.join([client_data[1], client_data[2]])
 
-    return render_template('base_card.html', values=payload, name=name, kind='Client')
+    return render_template('base_card.html', values=payload, name=name, kind='Client', edit_page="/client/edit/<int:uid>/")
+
+@client_blueprint.route('/clients/edit/<int:uid>/', methods=['GET', 'POST'])
+@login_required
+def client_edit(uid):
+    client_data = get_people_info(uid, 'clients')
+    fields = [('name', client_data[1], 'Имя', True), 
+              ('surname', client_data[2], 'Фамилия', True), 
+              ('birth', client_data[3], 'Дата рождения', True),
+              ('condition', client_data[4], 'Состояние', True),
+              ('diagnosis', client_data[5], 'Диагноз', True),
+              ('phone_main', client_data[6], 'Основной телефон для связи', True),
+              ('phone_secondary', client_data[7], 'Дополнительный телефон для связи', False),
+              ('tg_id', client_data[8], 'Контакт в Телеграм', False),
+              ('email', client_data[9], 'Email', False),
+              ('position', client_data[10], 'Профессия', False),
+              ('hobbies', client_data[11], 'Хобби', False),
+              ('comment', client_data[12], 'Комментарий', False)]
+
+    return render_template('base_edit.html', values=fields, who='подопечного', back_to="/clients/<int:uid>/")
 
 
 @client_blueprint.route('/clients/', methods=['GET', 'POST'])
@@ -150,8 +169,8 @@ def clients_table():
     fields = [('name', 'Имя'), 
               ('surname', 'Фамилия'), 
               ('birth', 'Дата рождения'),
-              ('diagnosis', 'Диагноз'),
               ('condition', 'Состояние'),
+              ('diagnosis', 'Диагноз'),
               ('phone_main', 'Основной телефон для связи'),
               ('phone_secondary', 'Дополнительный телефон для связи'),
               ('tg_id', 'Контакт в Телеграм'),
@@ -166,5 +185,5 @@ def clients_table():
         id_query = con.execute("""select id from clients""")
         ids = [str(x[0]) for x in id_query.fetchall()]
 
-    return render_template('base_table.html', values=fields, who='подопечных', margin_left=0,
+    return render_template('base_table.html', values=fields, who='подопечных', margin_left=-00,
                             db_table=table, ids=ids, where_to="/client_registration", whom="подопечного", bp='client', zip=zip)  # render a template
