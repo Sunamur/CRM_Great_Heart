@@ -3,13 +3,17 @@
 {% block content %}
 
 <h1 align=center >Это - главная страница</h1>
-<h2 align=center >Здесь можно зарегестрировать:</h2>
+<h2 align=center >Здесь можно зарегестрировать нового:</h2>
 <ul align=center>
     <li><a href={{url_for("main.user_registration")}} title="Create new record"> Сотрудника</a>      </li>
     <li><a href={{url_for("client.client_registration")}} title="Create new record">Подопечного</a>      </li>
     <li><a href={{url_for("partner.partner_registration")}} title="Create new record">Партнера</a>      </li>
     <li><a href={{url_for("benefactor.benefactor_registration")}} title="Create new record">Благотворителя</a>      </li>
-    <li><a href={{url_for("client.client_query")}} title="Create new record">Обращение от подопечного</a>      </li>
-
+</ul>
+<p></p>
+<h2 align=center >Либо завести новое обращение:</h2>
+<ul align=center>
+    <li><a href={{url_for("client.client_query")}} title="Create new record">от подопечного</a>      </li>
+    <li><a href={{url_for("benefactor.benefactor_query")}} title="Create new record">от благотворителя</a>      </li>
 </ul>
 {% endblock %}
