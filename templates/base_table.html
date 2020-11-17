@@ -3,9 +3,10 @@
 {% block content %}
 
 <style>
-    div.with-margins {
-        margin-left: {{margin_left}}px;
+    table {
+        word-wrap: wrap break-word;
     }
+
 </style>
 
 <div class="container">
@@ -23,13 +24,13 @@
                 {% for db_field, table_field in values %}
                     <th class="column-header"><a>{{table_field}}</a></th>
                 {% endfor %}
-                <th class="column-header"><a>Ссылка на страницу {{whom}}</a></th>
+                <th class="column-header"><a>Cтраница {{whom}}</a></th>
             </tr>
             
         </thead>
         <tbody>
             {% for id, row in zip(ids, db_table) %}
-            <tr class='clickable-row' data-href={{url_for(bp+".client_card", uid=id)}}>
+            <tr class='clickable-row'>
                 {% for field in row %}
                     <td>{{field}}</td>
                 {% endfor %}

@@ -17,33 +17,25 @@ def home():
 @main_blueprint.route('/users/', methods=['GET', 'POST'])
 @login_required
 def users_table():
-    fields = [('name', 'Имя'), 
+    fields = [('login', 'Логин'),
+              ('name', 'Имя'), 
               ('surname', 'Фамилия'), 
               ('birth_date', 'Дата рождения'),
               ('city', 'Город'),
-              ('phone_personal', 'Основной телефон для связи'),
-              ('email_personal', 'Email'),
-              ('tg_id', 'Контакт в Телеграм'),
-              ('phone_work', 'Дополнительный телефон для связи'),
+              ('phone_personal', 'Телефон для связи'),
               ('work_place', 'Место основной работы'),
               ('position', 'Профессия'),
-              ('position_fund', 'Позиция в фонде'),
-              ('education', 'Образование'),
-              ('education_minor', 'Доп. образование'),
-              ('languages', 'Знание языков'),
-              ('hobbies', 'Хобби'),
-              ('comment', 'Комментарий')]
+              ('position_fund', 'Позиция в фонде')]
     with db.connect() as con:
-        query = con.execute("""select name, surname, birth_date, city, phone_personal, email_personal,
-                                 tg_id, phone_work, work_place, position, position_fund, education, education_minor,
-                                 languages, hobbies, comment from users""")
+        query = con.execute("""select login, name, surname, birth_date, city, phone_personal, 
+                        work_place, position, position_fund from users""")
         table = query.fetchall()
         id_query = con.execute("""select id from users""")
         ids = [str(x[0]) for x in id_query.fetchall()]
 
-    return render_template('base_table.html', values=fields, who='сотрудников', margin_left=-330, 
-                            db_table=table, ids=ids, where_to="/user_registration", whom="сотрудника", 
-                            bp='main', zip=zip, card_to='/users/')
+    return render_template('base_table.html', values=fields, who='сотрудников', margin_left=-10, 
+                            db_table=table, ids=ids, where_to="/user_registration/", whom="сотрудника",
+                            zip=zip, card_to='/users/')
 
 @main_blueprint.route('/login/', methods=['GET', 'POST'])
 def login():
@@ -81,21 +73,44 @@ def get_people_info(uid, table='clients'):
         return res
 
 
-@main_blueprint.route('/user_registration/', methods=['GET', 'POST'])
+@main_blueprint.route('/user_registration/')
 @login_required
 def user_registration():
+    fields = [('login', 'hummel', 'Логин', True),
+              ('name', "Иван", 'Имя', True), 
+              ('surname', "Иванов", 'Фамилия', True), 
+              ('birth_date', "01-01-2020", 'Дата рождения', True),
+              ('city', 'Междуречье', 'Город', True),
+              ('phone_personal', "+7-800-555-35-35", 'Телефон для связи', True),
+              ('email_personal', "ivanov_ivan@mail.ru", 'Email', False),
+              ('tg_id', "@pupa_and_lupa", 'Контакт в Телеграм', False),
+              ('phone_work', "+7-999-999-99-99", 'Дополнительный телефон для связи', False),
+              ('work_place', "Хлебохладокомбинат", 'Место основной работы', True),
+              ('position', "Тракторист", 'Профессия', True),
+              ('position_fund', "Волонтёр", 'Позиция в фонде', True),
+              ('education', "Высшее", 'Образование', False),
+              ('education_minor', "Курсы по Dota 2", 'Доп. образование', False),
+              ('languages', "Хорватский, польский", 'Знание языков', False),
+              ('hobbies', "Любит писать CRM за еду", 'Хобби', False),
+              ('comment', "Любит ванильный кофе", 'Комментарий', False)]
+
+    return render_template('base_registration.html', values=fields, who='сотрудника', registrated_to='/user_registrated/')
+
+@main_blueprint.route('/user_registrated/', methods=['POST'])
+@login_required
+def user_registrated():
     if request.method == 'POST':
         vals = request.form.to_dict()
-        client_dict = {}
+        user_dict = {}
 
         for (key, value) in vals.items():
             # Check if key is even then add pair to new dictionary
             if (value != '') :
-                client_dict[key] = value
+                user_dict[key] = value
 
-        cols = list(client_dict.keys())
+        cols = list(user_dict.keys())
         cols = ", ".join(list(cols))
-        vals = list(client_dict.values())
+        vals = list(user_dict.values())
         for i in range(len(vals)):
             if isinstance(vals[i], str):
                 vals[i] = "'" + vals[i] + "'"
@@ -107,30 +122,13 @@ def user_registration():
         with db.connect() as con:
             con.execute(q)
 
-    fields = [('name', "Иван", 'Имя', True), 
-              ('surname', "Иванов", 'Фамилия', True), 
-              ('birth_date', "01-01-2020", 'Дата рождения', True),
-              ('city', 'Междуречье', 'Город', True),
-              ('phone_personal', "+7-800-555-35-35", 'Основной телефон для связи', True),
-              ('email_personal', "ivanov_ivan@mail.ru", 'Email', False),
-              ('tg_id', "@pupa_and_lupa", 'Контакт в Телеграм', False),
-              ('phone_work', "+7-999-999-99-99", 'Дополнительный телефон для связи', False),
-              ('work_place', "Хлебохладокомбинат", 'Место основной работы', False),
-              ('position', "Тракторист", 'Профессия', False),
-              ('position_fund', "Волонтёр", 'Позиция в фонде', False),
-              ('education', "Высшее", 'Образование', False),
-              ('education_minor', "Курсы по Dota 2", 'Доп. образование', False),
-              ('languages', "Хорватский, польский", 'Знание языков', False),
-              ('hobbies', "Любит писать CRM за еду", 'Хобби', False),
-              ('comment', "Любит ванильный кофе", 'Комментарий', False)]
-
-    return render_template('base_registration.html', values=fields, who='сотрудника')  # render a template
+    return redirect('/users')
 
 
 @main_blueprint.route('/users/<int:uid>/', methods=['GET'])
 @login_required
-def client_card(uid):
-    data = get_people_info(uid, 'users')
+def user_card(uid):
+    user_data = get_people_info(uid, 'users')
     fields = [
         ('id','ID'),
         ('login','Логин'),
@@ -155,15 +153,16 @@ def client_card(uid):
         ('is_active', 'Активен')
     ]
 
-    if data is None:
+    if user_data is None:
         abort(404)
-    if len(fields)!=len(data): 
-        print(data)
+    if len(fields)!=len(user_data): 
+        print(user_data)
         abort(500)
-    payload = [[fieldname,pretty_name,data] for [fieldname,pretty_name],data in zip(fields, data)]
-    name = ' '.join([data[1], data[2]])
+    payload = [[fieldname,pretty_name,data] for [fieldname,pretty_name],data in zip(fields, user_data)]
+    name = ' '.join([user_data[1], user_data[2]])
 
-    return render_template('base_card.html', values=payload, name=name, kind='User', edit_page='/users/edit/' + str(uid))
+    return render_template('base_card.html', values=payload, name=name, kind='User', 
+            edit_page='/users/edit/' + str(uid) + '/', table_page='/users/')
 
 @main_blueprint.route('/users/edit/<int:uid>/', methods=['GET', 'POST'])
 @login_required
@@ -186,4 +185,50 @@ def user_edit(uid):
               ('hobbies', user_data[16], 'Хобби', False),
               ('comment', user_data[17], 'Комментарий', False)]
 
-    return render_template('base_edit.html', values=fields, who='сотруднике', back_to="/users/<int:uid>/")
+    if user_data is None:
+        abort(404)
+
+    return render_template('base_edit.html', values=fields, who='сотруднике', 
+                edit_to="/users/edited/" + str(uid) + '/', delete_to='/users/delete/' + str(uid) + '/')
+
+@main_blueprint.route('/users/edited/<int:uid>/', methods=['POST'])
+@login_required
+def user_edited(uid):
+
+    if request.method == 'POST':
+        vals = request.form.to_dict()
+        user_dict = {}
+
+        for (key, value) in vals.items():
+            # Check if key is even then add pair to new dictionary
+            if (value != '') :
+                user_dict[key] = value
+
+        cols = list(user_dict.keys())
+        # cols = ", ".join(list(cols))
+        vals = list(user_dict.values())
+        for i in range(len(vals)):
+            if isinstance(vals[i], str):
+                vals[i] = "'" + vals[i] + "'"
+        # vals = ", ".join(list(vals))
+        q = 'update users set '
+        for i,j in zip(cols, vals):
+            print(type(j))
+            print(j == '\'None\'')
+            if j != '\'None\'':
+                q += f'{i} = {j},'
+
+        q = q[:-1]
+        q += f' where id = {uid}'
+        with db.connect() as con:
+            con.execute(q)
+
+    return redirect(url_for('main.users_table'))
+
+@main_blueprint.route('/users/delete/<int:uid>/', methods=['GET', 'POST'])
+@login_required
+def user_delete(uid):
+    
+    # Тут SQL запрос на удаление персонажа
+
+    return redirect('/users/')

@@ -16,16 +16,16 @@ input.form-control {
 
     <div class="container">
       <h1>Редактирование данных о {{who}}</h1>
-      <form action={{back_to}} method="post" role="form" class='form-horizontal'>
+      <form action={{edit_to}} method=post role="form" class='form-horizontal'>
         
         {% for name, value, placeholder_name, is_strong in values %}
           <div class="form-group">
             <label for={{name}} class="col-md-2 control-label">{{placeholder_name}}{% if is_strong %}<strong style="color: red">*</strong>{% endif %}</label>
             <div class="col-md-10">
               {% if is_strong%}
-              <input class="form-control" id={{name}} name={{name}} required type="text" value={{value}}>
+              <input class="form-control" id={{name}} name={{name}} required type="text" value="{{value}}">
               {% else %}
-              <input class="form-control" id={{name}} name={{name}} type="text" value={{value}}>
+              <input class="form-control" id={{name}} name={{name}} type="text" value="{{value}}">
               {% endif %}
             </div>
           </div>
